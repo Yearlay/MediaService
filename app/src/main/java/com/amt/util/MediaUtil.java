@@ -294,8 +294,6 @@ public class MediaUtil {
         public static final byte IMAGE = 3;
         /** 文件夹 value:4 */
         public static final byte FOLDER = 4;
-        /** 收藏 value:9 */
-        public static final byte COLLECT = 9;
     };
     
     public static int getMediaType(String fileName) {

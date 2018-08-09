@@ -1,5 +1,7 @@
 package com.amt.bean;
 
+import android.content.ContentValues;
+
 import com.amt.util.StorageConfig;
 
 import java.text.SimpleDateFormat;
@@ -10,8 +12,10 @@ import java.util.Date;
  * Created by archermind on 2018/8/9.
  */
 public class MediaBean {
+    public static final String FIELD_ID = "id";
     private int id;
 
+    public static final String FIELD_PORT_ID = "port_id";
     /**
      * 磁盘的挂载端口
      * 0：未知，其他。
@@ -28,18 +32,25 @@ public class MediaBean {
      * 2：视频。
      * 3：图片。
      */
+    public static final String FIELD_FILE_TYPE = "filetype";
     private int fileType;
 
+    public static final String FIELD_FILE_PATH = "filepath";
     private String filePath;
+    public static final String FIELD_FILE_NAME = "filename";
     private String fileName;
+    public static final String FIELD_FILE_NAME_PY = "filename_py";
     private String fileNamePY;
+    public static final String FIELD_FILE_SIZE = "filesize";
     private long fileSize;
 
+    public static final String FIELD_FILE_LASTDATE = "lastdate";
     /**
      * yyyy-MM-dd HH:mm
      */
     private String lastDate;
 
+    public static final String FIELD_ID3_FLAG = "id3_flag";
     /**
      * ID3信息的状态。
      * 0：ID3信息未解析。
@@ -47,6 +58,7 @@ public class MediaBean {
      */
     private int id3Flag;
 
+    public static final String FIELD_UNSUPPORT_FLAG = "unsupport_flag";
     /**
      * 不支持标志。
      * 0：支持。
@@ -54,6 +66,7 @@ public class MediaBean {
      */
     private int unsupportFlag;
 
+    public static final String FIELD_COLLECT_FLAG = "collect_flag";
     /**
      * 收藏标志。
      * 0：未收藏。
@@ -77,6 +90,23 @@ public class MediaBean {
         this.fileSize = file.length();
         Date date = new Date(file.lastModified());
         this.lastDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").format(date);
+    }
+
+     public ContentValues getContentValues(ContentValues contentValues) {
+        if (contentValues == null) {
+            contentValues = new ContentValues();
+        }
+        contentValues.put(FIELD_PORT_ID, portId);
+        contentValues.put(FIELD_FILE_TYPE, fileType);
+        contentValues.put(FIELD_FILE_PATH, filePath);
+        contentValues.put(FIELD_FILE_NAME, fileName);
+        contentValues.put(FIELD_FILE_NAME_PY, fileNamePY);
+        contentValues.put(FIELD_FILE_SIZE, fileSize);
+        contentValues.put(FIELD_FILE_LASTDATE, lastDate);
+        contentValues.put(FIELD_ID3_FLAG, id3Flag);
+        contentValues.put(FIELD_UNSUPPORT_FLAG, unsupportFlag);
+        contentValues.put(FIELD_COLLECT_FLAG, collectFlag);
+        return contentValues;
     }
 
     public int getId() {

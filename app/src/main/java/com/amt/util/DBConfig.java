@@ -1,5 +1,11 @@
 package com.amt.util;
 
+import com.amt.bean.CollectAudioBean;
+import com.amt.bean.CollectImageBean;
+import com.amt.bean.CollectVideoBean;
+import com.amt.bean.MediaBean;
+import com.amt.bean.StorageBean;
+
 /**
  * Created by archermind on 2018/8/9.
  */
@@ -30,5 +36,45 @@ public class DBConfig {
         public final static String COLLECT_AUDIO = "collect_audio";
         public final static String COLLECT_VIDEO = "collect_video";
         public final static String COLLECT_IMAGE = "collect_image";
+    }
+
+    public static String getTableName(MediaBean mediaBean) {
+        String tableName = null;
+        if (mediaBean instanceof CollectAudioBean ||
+                mediaBean instanceof CollectVideoBean ||
+                mediaBean instanceof CollectImageBean) {
+            if (mediaBean.getFileType() == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.COLLECT_AUDIO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.COLLECT_VIDEO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.COLLECT_IMAGE;
+            }
+        } else if (mediaBean.getPortId() == StorageConfig.PortId.SDCARD_PORT) {
+            if (mediaBean.getFileType() == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.SDCARD_AUDIO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.SDCARD_VIDEO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.SDCARD_IMAGE;
+            }
+        } else if (mediaBean.getPortId() == StorageConfig.PortId.USB1_PORT) {
+            if (mediaBean.getFileType() == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.USB1_AUDIO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.USB1_VIDEO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.USB1_IMAGE;
+            }
+        } else if (mediaBean.getPortId() == StorageConfig.PortId.USB2_PORT) {
+            if (mediaBean.getFileType() == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.USB2_AUDIO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.USB2_VIDEO;
+            } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.USB2_IMAGE;
+            }
+        }
+        return tableName;
     }
 }

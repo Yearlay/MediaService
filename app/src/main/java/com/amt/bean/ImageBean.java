@@ -1,13 +1,26 @@
 package com.amt.bean;
 
+import android.content.ContentValues;
+
 /**
  * Created by archermind on 2018/8/9.
  */
 
 public class ImageBean extends MediaBean {
+    public static final String FIELD_IMAGE_WIDTH = "width";
     private int width;
+    public static final String FIELD_IMAGE_HEIGHT = "height";
     private int height;
+    public static final String FIELD_THUMBNAIL_PATH = "thumbnail_path";
     private String thumbnailPath;
+
+    public ContentValues getContentValues(ContentValues contentValues) {
+        contentValues = super.getContentValues(contentValues);
+        contentValues.put(FIELD_IMAGE_WIDTH, width);
+        contentValues.put(FIELD_IMAGE_HEIGHT, height);
+        contentValues.put(FIELD_THUMBNAIL_PATH, thumbnailPath);
+        return contentValues;
+    }
 
     public int getWidth() {
         return width;

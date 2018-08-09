@@ -12,7 +12,7 @@ public class StorageConfig {
     public static String USB1_STORAGE_PATH = "/mnt/media_rw/usb_storage";
     public static String USB2_STORAGE_PATH = "/mnt/media_rw/usb_storage1";
 
-    public class PortId {
+    public static class PortId {
         public static final int NULL = 0;
         public static final int SDCARD_PORT = 1;
         public static final int USB1_PORT = 2;
