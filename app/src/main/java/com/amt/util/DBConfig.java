@@ -1,5 +1,7 @@
 package com.amt.util;
 
+import android.provider.MediaStore;
+
 import com.amt.bean.CollectAudioBean;
 import com.amt.bean.CollectImageBean;
 import com.amt.bean.CollectVideoBean;
@@ -36,6 +38,36 @@ public class DBConfig {
         public final static String COLLECT_AUDIO = "collect_audio";
         public final static String COLLECT_VIDEO = "collect_video";
         public final static String COLLECT_IMAGE = "collect_image";
+    }
+
+    public static String getTableName(int portId, int fileType) {
+        String tableName = null;
+        if (portId == StorageConfig.PortId.SDCARD_PORT) {
+            if (fileType == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.SDCARD_AUDIO;
+            } else if (fileType == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.SDCARD_VIDEO;
+            } else if (fileType == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.SDCARD_IMAGE;
+            }
+        } else if (portId == StorageConfig.PortId.USB1_PORT) {
+            if (fileType == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.USB1_AUDIO;
+            } else if (fileType == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.USB1_VIDEO;
+            } else if (fileType == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.USB1_IMAGE;
+            }
+        } else if (portId == StorageConfig.PortId.USB2_PORT) {
+            if (fileType == MediaUtil.FileType.AUDIO) {
+                tableName = DBTable.USB2_AUDIO;
+            } else if (fileType == MediaUtil.FileType.VIDEO) {
+                tableName = DBTable.USB2_VIDEO;
+            } else if (fileType == MediaUtil.FileType.IMAGE) {
+                tableName = DBTable.USB2_IMAGE;
+            }
+        }
+        return tableName;
     }
 
     public static String getTableName(MediaBean mediaBean) {

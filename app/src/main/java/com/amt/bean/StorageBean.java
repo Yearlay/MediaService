@@ -1,12 +1,15 @@
 package com.amt.bean;
 
+import com.amt.util.StorageConfig;
+
+import java.io.File;
+
 /**
  * Created by archermind on 2018/8/9.
  */
 
 public class StorageBean {
     private int id;
-
     /**
      * 磁盘的挂载端口
      * 0：未知，其他。
@@ -15,7 +18,6 @@ public class StorageBean {
      * 3. usb2 port.
      */
     private int portId;
-
     private String storagePath;
     private String storageName;
     private long storageSize;
@@ -39,6 +41,23 @@ public class StorageBean {
     private int audioCount;
     private int videoCount;
     private int imageCount;
+
+    public StorageBean(int portId) {
+        this.portId = portId;
+        this.storagePath = StorageConfig.getStoragePath(portId);
+    }
+
+    public void updateStorageInfo() { //TODO
+        this.storageName = "";
+        this.storageSize = 0;
+        this.onlyReadFlag = 0;
+    }
+
+    public void updateMediaCount(int audioCount, int videoCount, int imageCount) {
+        this.audioCount = audioCount;
+        this.videoCount = videoCount;
+        this.imageCount = imageCount;
+    }
 
     public int getId() {
         return id;
@@ -119,4 +138,5 @@ public class StorageBean {
     public void setImageCount(int imageCount) {
         this.imageCount = imageCount;
     }
+
 }

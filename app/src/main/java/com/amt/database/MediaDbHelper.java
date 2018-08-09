@@ -92,6 +92,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         sqlStr += MediaBean.FIELD_FILE_NAME_PY +      " text,";
         sqlStr += MediaBean.FIELD_FILE_SIZE +         " long DEFAULT 0,";
         sqlStr += MediaBean.FIELD_FILE_LASTDATE +     " text,";
+        sqlStr += MediaBean.FIELD_ONLYREAD_FLAG +     " integer DEFAULT 0,";
         sqlStr += MediaBean.FIELD_ID3_FLAG +          " integer DEFAULT 0,";
         sqlStr += MediaBean.FIELD_UNSUPPORT_FLAG +    " integer DEFAULT 1,";
         sqlStr += MediaBean.FIELD_COLLECT_FLAG +      " integer DEFAULT 0,";

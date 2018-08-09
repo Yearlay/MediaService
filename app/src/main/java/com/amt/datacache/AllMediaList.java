@@ -2,8 +2,12 @@ package com.amt.datacache;
 
 import android.content.Context;
 
+import com.amt.bean.MediaBean;
 import com.amt.database.MediaDbHelper;
 import com.amt.mediaservice.MediaApplication;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -11,6 +15,10 @@ import com.amt.mediaservice.MediaApplication;
 
 public class AllMediaList {
     private static final String TAG = "AllMediaList";
+
+    private Object mLoadLock = new Object();
+
+    private HashMap<String, ArrayList<MediaBean>> mAllMediaHash = new HashMap<String, ArrayList<MediaBean>>();
 
     private Context mContext;
     private MediaDbHelper mMediaDbHelper;
@@ -30,7 +38,7 @@ public class AllMediaList {
 
     private AllMediaList(Context context) {
         mContext = context;
-//        mMediaDbHelper = new MediaDbHelper(mContext);
+        mMediaDbHelper = new MediaDbHelper(mContext);
 //        mLocalHandler = new LocalHandler();
 //
 //        registerObserverAll();

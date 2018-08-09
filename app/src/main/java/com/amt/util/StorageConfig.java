@@ -1,5 +1,7 @@
 package com.amt.util;
 
+import java.io.File;
+
 /**
  * Created by archermind on 2018/8/9.
  */
@@ -45,5 +47,23 @@ public class StorageConfig {
             storagePath = USB2_STORAGE_PATH;
         }
         return storagePath;
+    }
+
+    /**
+     *  此方法不可靠：U盘拔出一段时间之后，可能返回true;
+     */
+    public static boolean fileCheckMounted(String storagePath) {
+        if (storagePath == null) {
+            return false;
+        }
+        if (storagePath.contains(StorageConfig.SDCARD_STORAGE_PATH)) {
+            return true;
+        }
+        File file = new File(storagePath);
+        if (file.exists() && file.isDirectory() && file.canRead()
+                && file.canExecute()) {
+            return true;
+        }
+        return false;
     }
 }

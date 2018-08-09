@@ -50,6 +50,14 @@ public class MediaBean {
      */
     private String lastDate;
 
+    public static final String FIELD_ONLYREAD_FLAG = "onlyread_flag";
+    /**
+     * 只读标志
+     * 0：可读可写。
+     * 1：只读不可写。
+     */
+    private int onlyreadFlag;
+
     public static final String FIELD_ID3_FLAG = "id3_flag";
     /**
      * ID3信息的状态。
@@ -90,6 +98,7 @@ public class MediaBean {
         this.fileSize = file.length();
         Date date = new Date(file.lastModified());
         this.lastDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").format(date);
+        this.onlyreadFlag = file.canWrite() ? 0 : 1;
     }
 
      public ContentValues getContentValues(ContentValues contentValues) {
@@ -103,6 +112,7 @@ public class MediaBean {
         contentValues.put(FIELD_FILE_NAME_PY, fileNamePY);
         contentValues.put(FIELD_FILE_SIZE, fileSize);
         contentValues.put(FIELD_FILE_LASTDATE, lastDate);
+        contentValues.put(FIELD_ONLYREAD_FLAG, onlyreadFlag);
         contentValues.put(FIELD_ID3_FLAG, id3Flag);
         contentValues.put(FIELD_UNSUPPORT_FLAG, unsupportFlag);
         contentValues.put(FIELD_COLLECT_FLAG, collectFlag);
@@ -171,6 +181,14 @@ public class MediaBean {
 
     public void setLastDate(String lastDate) {
         this.lastDate = lastDate;
+    }
+
+    public int getOnlyreadFlag() {
+        return onlyreadFlag;
+    }
+
+    public void setOnlyreadFlag(int onlyreadFlag) {
+        this.onlyreadFlag = onlyreadFlag;
     }
 
     public int getId3Flag() {
