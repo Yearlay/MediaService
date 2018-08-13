@@ -28,14 +28,14 @@ extern "C"
 JNIEXPORT jstring
 
 JNICALL
-Java_com_amt_jni_ScanJni_stringFromJNI(
+Java_com_amt_media_jni_ScanJni_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
 
-jstring Java_com_amt_jni_ScanJni_getPY
+jstring Java_com_amt_media_jni_ScanJni_getPY
         (JNIEnv* env, jobject thiz, jstring jfileName)
 {
     const char *filename = env->GetStringUTFChars(jfileName, 0);
@@ -179,10 +179,10 @@ int readFileList(JNIEnv* env, jobject thiz, const char *basePath, int onlyGetMed
 jint Java_com_file_server_scan_ScanJni_scanRootPath
         (JNIEnv* env, jobject thiz, jstring rootPath, jint onlyGetMediaSizeFlag)
 {
-    fileNodeClass = env->FindClass("com/amt/bean/MediaBean");
+    fileNodeClass = env->FindClass("com/amt/media/bean/MediaBean");
     mediaBeanID = env->GetMethodID(fileNodeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    scanJniClass = env->FindClass("com/amt/jni/ScanJni");
-    insertToDbID = env->GetMethodID(scanJniClass, "insertToDb", "(Lcom/amt/bean/MediaBean;)V");
+    scanJniClass = env->FindClass("com/amt/media/jni/ScanJni");
+    insertToDbID = env->GetMethodID(scanJniClass, "insertToDb", "(Lcom/amt/media/bean/MediaBean;)V");
 
     const char *basePath = env->GetStringUTFChars(rootPath, 0);
     int count = readFileList(env, thiz, basePath, (int)onlyGetMediaSizeFlag);

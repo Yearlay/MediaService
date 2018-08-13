@@ -1,8 +1,6 @@
-package com.amt.bean;
+package com.amt.media.bean;
 
-import com.amt.util.StorageConfig;
-
-import java.io.File;
+import com.amt.media.util.StorageConfig;
 
 /**
  * Created by archermind on 2018/8/9.

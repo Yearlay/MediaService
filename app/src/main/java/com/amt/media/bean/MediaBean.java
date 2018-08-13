@@ -1,8 +1,8 @@
-package com.amt.bean;
+package com.amt.media.bean;
 
 import android.content.ContentValues;
 
-import com.amt.util.StorageConfig;
+import com.amt.media.util.StorageConfig;
 
 import java.text.SimpleDateFormat;
 import java.io.File;

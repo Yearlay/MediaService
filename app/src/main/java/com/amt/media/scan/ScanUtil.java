@@ -1,4 +1,4 @@
-package com.amt.scan;
+package com.amt.media.scan;
 
 /**
  * Created by archermind on 2018/8/13.

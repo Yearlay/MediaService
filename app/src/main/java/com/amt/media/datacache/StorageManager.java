@@ -1,7 +1,7 @@
-package com.amt.datacache;
+package com.amt.media.datacache;
 
-import com.amt.bean.StorageBean;
-import com.amt.util.StorageConfig;
+import com.amt.media.bean.StorageBean;
+import com.amt.media.util.StorageConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;

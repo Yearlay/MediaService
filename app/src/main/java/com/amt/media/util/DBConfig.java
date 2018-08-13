@@ -1,12 +1,9 @@
-package com.amt.util;
+package com.amt.media.util;
 
-import android.provider.MediaStore;
-
-import com.amt.bean.CollectAudioBean;
-import com.amt.bean.CollectImageBean;
-import com.amt.bean.CollectVideoBean;
-import com.amt.bean.MediaBean;
-import com.amt.bean.StorageBean;
+import com.amt.media.bean.CollectAudioBean;
+import com.amt.media.bean.CollectImageBean;
+import com.amt.media.bean.CollectVideoBean;
+import com.amt.media.bean.MediaBean;
 
 /**
  * Created by archermind on 2018/8/9.

@@ -28,7 +28,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="com.amt.receiver.MediaReceiver">
+        <receiver android:name="com.amt.media.receiver.MediaReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <action android:name="android.intent.action.MEDIA_UNMOUNTED" />

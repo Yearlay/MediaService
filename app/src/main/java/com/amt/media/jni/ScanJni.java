@@ -1,6 +1,6 @@
-package com.amt.jni;
+package com.amt.media.jni;
 
-import com.amt.bean.MediaBean;
+import com.amt.media.bean.MediaBean;
 
 public class ScanJni {
     static {

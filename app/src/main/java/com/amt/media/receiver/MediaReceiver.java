@@ -1,13 +1,13 @@
-package com.amt.receiver;
+package com.amt.media.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.amt.scan.ScanUtil;
+import com.amt.media.scan.ScanUtil;
 import com.amt.service.MediaService;
 import com.amt.util.DebugLog;
-import com.amt.util.StorageConfig;
+import com.amt.media.util.StorageConfig;
 
 /**
  * Created by archermind on 2018/8/13.

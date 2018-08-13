@@ -1,4 +1,4 @@
-package com.amt.bean;
+package com.amt.media.bean;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

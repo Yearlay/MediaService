@@ -1,4 +1,4 @@
-package com.amt.util;
+package com.amt.media.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -7,27 +7,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import com.amt.bean.MediaBean;
-import com.amt.bean.StorageBean;
-import com.amt.bean.UserBean;
-import com.amt.bean.UserInfoBean;
+import com.amt.media.bean.MediaBean;
+import com.amt.media.bean.UserBean;
+import com.amt.media.bean.UserInfoBean;
+import com.amt.util.DebugLog;
 import com.amt.util.GsonUtil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.os.Environment;
 import android.os.StatFs;
-import android.os.storage.StorageManager;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 
 public class MediaUtil {
     public final static int COLLECT_COUNT_MAX = 1000;

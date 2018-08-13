@@ -1,6 +1,6 @@
-package com.amt.datacache;
+package com.amt.media.datacache;
 
-import com.amt.bean.StorageBean;
+import com.amt.media.bean.StorageBean;
 
 /**
  * Created by archermind on 2018/8/13.

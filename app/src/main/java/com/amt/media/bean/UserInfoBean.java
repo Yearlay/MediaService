@@ -1,4 +1,4 @@
-package com.amt.bean;
+package com.amt.media.bean;
 
 import java.util.ArrayList;
 

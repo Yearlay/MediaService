@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.amt.jni.ScanJni;
+import com.amt.media.jni.ScanJni;
 
 public class HomeActivity extends AppCompatActivity {
 

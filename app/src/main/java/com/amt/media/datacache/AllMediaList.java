@@ -1,9 +1,9 @@
-package com.amt.datacache;
+package com.amt.media.datacache;
 
 import android.content.Context;
 
-import com.amt.bean.MediaBean;
-import com.amt.database.MediaDbHelper;
+import com.amt.media.bean.MediaBean;
+import com.amt.media.database.MediaDbHelper;
 import com.amt.mediaservice.MediaApplication;
 
 import java.util.ArrayList;

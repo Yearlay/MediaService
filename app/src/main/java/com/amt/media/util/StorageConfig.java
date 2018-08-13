@@ -1,4 +1,4 @@
-package com.amt.util;
+package com.amt.media.util;
 
 import java.io.File;
 

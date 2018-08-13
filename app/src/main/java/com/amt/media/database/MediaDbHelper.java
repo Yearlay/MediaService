@@ -1,17 +1,17 @@
-package com.amt.database;
+package com.amt.media.database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.amt.bean.AudioBean;
-import com.amt.bean.CollectAudioBean;
-import com.amt.bean.VideoBean;
-import com.amt.bean.ImageBean;
-import com.amt.bean.MediaBean;
-import com.amt.util.DBConfig;
-import com.amt.util.MediaUtil.FileType;
+import com.amt.media.bean.AudioBean;
+import com.amt.media.bean.CollectAudioBean;
+import com.amt.media.bean.VideoBean;
+import com.amt.media.bean.ImageBean;
+import com.amt.media.bean.MediaBean;
+import com.amt.media.util.DBConfig;
+import com.amt.media.util.MediaUtil.FileType;
 
 import java.util.ArrayList;
 import java.util.Collections;
