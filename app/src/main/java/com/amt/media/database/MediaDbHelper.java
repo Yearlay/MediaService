@@ -2,16 +2,24 @@ package com.amt.media.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.amt.media.bean.AudioBean;
 import com.amt.media.bean.CollectAudioBean;
+import com.amt.media.bean.CollectImageBean;
+import com.amt.media.bean.CollectVideoBean;
+import com.amt.media.bean.StorageBean;
 import com.amt.media.bean.VideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
+import com.amt.media.datacache.AllMediaList;
+import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
+import com.amt.media.util.MediaUtil;
 import com.amt.media.util.MediaUtil.FileType;
+import com.amt.util.DebugLog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +30,7 @@ import java.util.List;
  */
 
 public class MediaDbHelper extends SQLiteOpenHelper {
+    private static final String TAG = "MediaDbHelper";
     private Context mContext = null;
 
     public Context getContext() {
@@ -251,6 +260,177 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         if (ret > 0) {
             // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
         }
+    }
+
+    /**
+     * 删除某个磁盘的所有媒体数据。
+     * @param portId
+     */
+    public void clearStorageData(int portId) {
+        clearData(portId, FileType.AUDIO);
+        clearData(portId, FileType.VIDEO);
+        clearData(portId, FileType.IMAGE);
+    }
+
+    private void clearData(int portId, int fileType) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        String tableName = DBConfig.getTableName(portId, fileType);
+        String sqlStr = "DELETE FROM " + tableName;
+        sqLiteDatabase.execSQL(sqlStr);
+    }
+
+
+    public ArrayList<MediaBean> query(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<MediaBean> mediaBeanList = new ArrayList<MediaBean>();
+        if (DBConfig.getFileType(tableName) == FileType.AUDIO) {
+            mediaBeanList.addAll(queryAudio(tableName, selection, selectionArgs, allFlag));
+        } else if (DBConfig.getFileType(tableName) == FileType.VIDEO) {
+            mediaBeanList.addAll(queryVideo(tableName, selection, selectionArgs, allFlag));
+        } else if (DBConfig.getFileType(tableName) == FileType.IMAGE) {
+            mediaBeanList.addAll(queryImage(tableName, selection, selectionArgs, allFlag));
+        }
+        if (mediaBeanList.size() == 0) {
+            DebugLog.e(TAG, "query tableName: + " + tableName + " && allFlag: " + allFlag +
+                    " && no datas selection: " + selection + " selectionArgs: " + selectionArgs);
+        } else {
+            // TODO 进行排序。
+            DebugLog.d(TAG, "query tableName: + " + tableName + " && allFlag: " + allFlag +
+                    " && media size： " + mediaBeanList.size());
+        }
+        return mediaBeanList;
+    }
+
+    private ArrayList<AudioBean> queryAudio(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<AudioBean> audioBeans = new ArrayList<AudioBean>();
+        if (DBConfig.isCollectTable(tableName)) {
+            audioBeans.addAll(queryCollectAudio(tableName, selection, selectionArgs, allFlag));
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        // TODO
+                    } while (cursor.moveToNext());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        }
+        return audioBeans;
+    }
+
+    private ArrayList<CollectAudioBean> queryCollectAudio(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<CollectAudioBean> collectAudioBeans = new ArrayList<CollectAudioBean>();
+        Cursor cursor = null;
+        try {
+            cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // TODO
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return collectAudioBeans;
+    }
+
+    private ArrayList<VideoBean> queryVideo(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<VideoBean> videoBeans = new ArrayList<VideoBean>();
+        if (DBConfig.isCollectTable(tableName)) {
+            videoBeans.addAll(queryCollectVideo(tableName, selection, selectionArgs, allFlag));
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        // TODO
+                    } while (cursor.moveToNext());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        }
+        return videoBeans;
+    }
+
+    private ArrayList<CollectVideoBean> queryCollectVideo(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<CollectVideoBean> collectVideoBeans = new ArrayList<CollectVideoBean>();
+        Cursor cursor = null;
+        try {
+            cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // TODO
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return collectVideoBeans;
+    }
+
+    private ArrayList<ImageBean> queryImage(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<ImageBean> imageBean = new ArrayList<ImageBean>();
+        if (DBConfig.isCollectTable(tableName)) {
+            imageBean.addAll(queryCollectImage(tableName, selection, selectionArgs, allFlag));
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        // TODO
+                    } while (cursor.moveToNext());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        }
+        return imageBean;
+    }
+
+    private ArrayList<CollectImageBean> queryCollectImage(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
+        ArrayList<CollectImageBean> collectImageBeans = new ArrayList<CollectImageBean>();
+        Cursor cursor = null;
+        try {
+            cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    CollectImageBean collectImageBean = new CollectImageBean(cursor);
+                    // TODO
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return collectImageBeans;
     }
 
 }

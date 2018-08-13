@@ -1,7 +1,7 @@
 package com.amt.util;
 
 public class DebugLog {
-    private static final boolean DEBUG = AmtConfig.ENABLE_DEBUG_LOG;
+    public static final boolean DEBUG = AmtConfig.ENABLE_DEBUG_LOG;
 
     public static void d(String tags, String str) {
         if (DEBUG) {

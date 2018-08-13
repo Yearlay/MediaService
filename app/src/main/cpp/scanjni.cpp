@@ -176,7 +176,7 @@ int readFileList(JNIEnv* env, jobject thiz, const char *basePath, int onlyGetMed
     return mediaCount;
 }
 
-jint Java_com_file_server_scan_ScanJni_scanRootPath
+jint Java_com_amt_media_jni_ScanJni_scanRootPath
         (JNIEnv* env, jobject thiz, jstring rootPath, jint onlyGetMediaSizeFlag)
 {
     fileNodeClass = env->FindClass("com/amt/media/bean/MediaBean");

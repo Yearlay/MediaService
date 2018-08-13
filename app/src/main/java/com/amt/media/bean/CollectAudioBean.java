@@ -1,6 +1,7 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -22,5 +23,10 @@ public class CollectAudioBean extends AudioBean {
         contentValues = super.getContentValues(contentValues);
         contentValues.put(FIELD_USERNAME, username);
         return contentValues;
+    }
+
+    public CollectAudioBean(Cursor cursor) {
+        super(cursor);
+        username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));
     }
 }

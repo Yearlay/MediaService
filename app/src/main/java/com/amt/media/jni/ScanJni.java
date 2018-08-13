@@ -1,6 +1,7 @@
 package com.amt.media.jni;
 
 import com.amt.media.bean.MediaBean;
+import com.amt.media.database.MediaDbHelper;
 
 public class ScanJni {
     static {
@@ -12,16 +13,12 @@ public class ScanJni {
     
     private static final String TAG = "ScanJni";
     
-    // private MediaDbHelper mMediaDbHelper;
-    public ScanJni() {
-
-    }
-    
-    /*public ScanJni(MediaDbHelper mediaDbHelper) {
+    private MediaDbHelper mMediaDbHelper;
+    public ScanJni(MediaDbHelper mediaDbHelper) {
         super();
         mMediaDbHelper = mediaDbHelper;
-    }*/
-    
+    }
+
     public void insertToDb(MediaBean mediaBean) {
         /*if (DBConfig.isMediaType(fileNode.getFileType())) {
             mMediaDbHelper.addToNeedToInsertList(new TransactionTask(fileNode, TransactionTask.INSERT_TASK));

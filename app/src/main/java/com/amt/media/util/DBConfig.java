@@ -106,4 +106,49 @@ public class DBConfig {
         }
         return tableName;
     }
+
+    public static int getPortId(String tableName) {
+        int portId = StorageConfig.PortId.NULL;
+        if (DBTable.SDCARD_AUDIO.equals(tableName) ||
+                DBTable.SDCARD_VIDEO.equals(tableName) ||
+                DBTable.SDCARD_IMAGE.equals(tableName)) {
+            portId = StorageConfig.PortId.SDCARD_PORT;
+        } else if (DBTable.USB1_AUDIO.equals(tableName) ||
+                DBTable.USB1_VIDEO.equals(tableName) ||
+                DBTable.USB1_IMAGE.equals(tableName)) {
+            portId = StorageConfig.PortId.USB1_PORT;
+        } else if (DBTable.USB2_AUDIO.equals(tableName) ||
+                DBTable.USB2_VIDEO.equals(tableName) ||
+                DBTable.USB2_IMAGE.equals(tableName)) {
+            portId = StorageConfig.PortId.USB2_PORT;
+        }
+        return portId;
+    }
+
+    public static int getFileType(String tableName) {
+        int fileType = MediaUtil.FileType.NULL;
+        if (DBTable.SDCARD_AUDIO.equals(tableName) ||
+                DBTable.USB1_AUDIO.equals(tableName) ||
+                DBTable.USB2_AUDIO.equals(tableName) ||
+                DBTable.COLLECT_AUDIO.equals(tableName)) {
+            fileType = MediaUtil.FileType.AUDIO;
+        } else if (DBTable.SDCARD_VIDEO.equals(tableName) ||
+                DBTable.USB1_VIDEO.equals(tableName) ||
+                DBTable.USB2_VIDEO.equals(tableName) ||
+                DBTable.COLLECT_VIDEO.equals(tableName)) {
+            fileType = MediaUtil.FileType.VIDEO;
+        } else if (DBTable.SDCARD_IMAGE.equals(tableName) ||
+                DBTable.USB1_IMAGE.equals(tableName) ||
+                DBTable.USB2_IMAGE.equals(tableName) ||
+                DBTable.COLLECT_IMAGE.equals(tableName)) {
+            fileType = MediaUtil.FileType.IMAGE;
+        }
+        return fileType;
+    }
+
+    public static boolean isCollectTable(String tableName) {
+        return DBTable.COLLECT_AUDIO.equals(tableName) ||
+                DBTable.COLLECT_VIDEO.equals(tableName) ||
+                DBTable.COLLECT_IMAGE.equals(tableName);
+    }
 }

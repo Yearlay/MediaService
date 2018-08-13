@@ -1,6 +1,7 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -20,6 +21,13 @@ public class ImageBean extends MediaBean {
         contentValues.put(FIELD_IMAGE_HEIGHT, height);
         contentValues.put(FIELD_THUMBNAIL_PATH, thumbnailPath);
         return contentValues;
+    }
+
+    public ImageBean(Cursor cursor) {
+        super(cursor);
+        width = cursor.getInt(cursor.getColumnIndex(FIELD_IMAGE_WIDTH));
+        height = cursor.getInt(cursor.getColumnIndex(FIELD_IMAGE_HEIGHT));
+        thumbnailPath = cursor.getString(cursor.getColumnIndex(FIELD_THUMBNAIL_PATH));
     }
 
     public int getWidth() {

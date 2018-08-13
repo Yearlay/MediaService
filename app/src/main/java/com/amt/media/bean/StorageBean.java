@@ -28,9 +28,10 @@ public class StorageBean {
     public static final int EJECT = 0;
     public static final int MOUNTED = 1;
     public static final int FILE_SCANNING = 2;
-    public static final int FILE_SCAN_OVER = 3;
-    public static final int ID3_PARSING = 4;
-    public static final int ID3_PARSE_OVER = 5;
+    public static final int SCAN_ERROR = 3;
+    public static final int FILE_SCAN_OVER = 4;
+    public static final int ID3_PARSING = 5;
+    public static final int ID3_PARSE_OVER = 6;
     /**
      * 磁盘的状态：
      * 0：Eject状态。未挂载状态。
@@ -141,6 +142,10 @@ public class StorageBean {
 
     public void setImageCount(int imageCount) {
         this.imageCount = imageCount;
+    }
+
+    public boolean isMounted() {
+        return state >= MOUNTED;
     }
 
 }

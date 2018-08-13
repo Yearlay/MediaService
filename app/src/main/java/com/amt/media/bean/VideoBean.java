@@ -1,6 +1,7 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -20,6 +21,13 @@ public class VideoBean extends MediaBean {
         contentValues.put(FIELD_THUMBNAIL_PATH, thumbnailPath);
         contentValues.put(FIELD_PLAY_TIME, playTime);
         return contentValues;
+    }
+
+    public VideoBean(Cursor cursor) {
+        super(cursor);
+        duration = cursor.getInt(cursor.getColumnIndex(FIELD_DURATION));
+        thumbnailPath = cursor.getString(cursor.getColumnIndex(FIELD_THUMBNAIL_PATH));
+        playTime = cursor.getInt(cursor.getColumnIndex(FIELD_PLAY_TIME));
     }
 
     public int getDuration() {

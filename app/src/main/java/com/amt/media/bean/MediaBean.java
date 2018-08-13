@@ -1,6 +1,7 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.amt.media.util.StorageConfig;
 
@@ -99,6 +100,21 @@ public class MediaBean {
         Date date = new Date(file.lastModified());
         this.lastDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").format(date);
         this.onlyreadFlag = file.canWrite() ? 0 : 1;
+    }
+
+    public MediaBean(Cursor cursor) {
+        id = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
+        portId = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
+        fileType = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
+        filePath = cursor.getString(cursor.getColumnIndex(FIELD_FILE_PATH));
+        fileName = cursor.getString(cursor.getColumnIndex(FIELD_FILE_NAME));
+        fileNamePY = cursor.getString(cursor.getColumnIndex(FIELD_FILE_NAME_PY));
+        fileSize = cursor.getLong(cursor.getColumnIndex(FIELD_FILE_SIZE));
+        lastDate = cursor.getString(cursor.getColumnIndex(FIELD_FILE_LASTDATE));
+        onlyreadFlag = cursor.getInt(cursor.getColumnIndex(FIELD_ONLYREAD_FLAG));
+        id3Flag = cursor.getInt(cursor.getColumnIndex(FIELD_ID3_FLAG));
+        unsupportFlag = cursor.getInt(cursor.getColumnIndex(FIELD_UNSUPPORT_FLAG));
+        collectFlag = cursor.getInt(cursor.getColumnIndex(FIELD_COLLECT_FLAG));
     }
 
      public ContentValues getContentValues(ContentValues contentValues) {
