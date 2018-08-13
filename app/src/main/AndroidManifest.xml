@@ -16,6 +16,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.amt.service.MediaService"
+            android:exported="true" >
+            <intent-filter android:priority="1000">
+                <action android:name="action.haoke.MEDIASERVICE" />
+            </intent-filter>
+            <intent-filter android:priority="1000">
+                <action android:name="com.jsbd.modeswitch.action" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="com.amt.receiver.MediaReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+                <action android:name="android.intent.action.MEDIA_EJECT" />
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

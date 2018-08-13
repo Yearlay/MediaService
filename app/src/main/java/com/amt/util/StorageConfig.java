@@ -7,9 +7,13 @@ import java.io.File;
  */
 
 public class StorageConfig {
-    // 设备路径（可配置，非常量）
-    public static String SDCARD_ROOT_PATH = "/mnt/media_rw/internal_sd/0";
+    // 设备MountService给过来的路径（可配置，非常量）
+    public static String SDCARD_ROOT_PATH_OLD = "/storage/internal_sd";
+    public static String USB1_STORAGE_PATH_OLD = "/storage/usb_storage";
+    public static String USB2_STORAGE_PATH_OLD = "/storage/usb_storage1";
 
+    // 设备真实路径（可配置，非常量）
+    public static String SDCARD_ROOT_PATH = "/mnt/media_rw/internal_sd/0";
     public static String SDCARD_STORAGE_PATH = SDCARD_ROOT_PATH + "/media";
     public static String USB1_STORAGE_PATH = "/mnt/media_rw/usb_storage";
     public static String USB2_STORAGE_PATH = "/mnt/media_rw/usb_storage1";
@@ -19,6 +23,18 @@ public class StorageConfig {
         public static final int SDCARD_PORT = 1;
         public static final int USB1_PORT = 2;
         public static final int USB2_PORT = 3;
+    }
+
+    public static String getRealPathOfStorage(String path) {
+        String storagePath = null;
+        if (SDCARD_ROOT_PATH_OLD.equals(path)) {
+            storagePath = SDCARD_STORAGE_PATH;
+        } else if (USB1_STORAGE_PATH_OLD.equals(path)) {
+            storagePath = USB1_STORAGE_PATH;
+        } else if (USB2_STORAGE_PATH_OLD.equals(path)) {
+            storagePath = USB2_STORAGE_PATH;
+        }
+        return storagePath;
     }
 
     // 根据路径来获取设备类型
