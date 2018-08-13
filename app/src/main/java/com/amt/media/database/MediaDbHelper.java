@@ -305,19 +305,23 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         if (DBConfig.isCollectTable(tableName)) {
             audioBeans.addAll(queryCollectAudio(tableName, selection, selectionArgs, allFlag));
         } else {
-            Cursor cursor = null;
-            try {
-                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    do {
-                        // TODO
-                    } while (cursor.moveToNext());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (cursor != null && !cursor.isClosed()) {
-                    cursor.close();
+            int portId = DBConfig.getPortId(tableName);
+            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            if (storageBean.isMounted()) {
+                Cursor cursor = null;
+                try {
+                    cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        do {
+                            audioBeans.add(new AudioBean(cursor));
+                        } while (cursor.moveToNext());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
                 }
             }
         }
@@ -331,7 +335,11 @@ public class MediaDbHelper extends SQLiteOpenHelper {
             cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    // TODO
+                    CollectAudioBean collectAudioBean = new CollectAudioBean(cursor);
+                    StorageBean storageBean = StorageManager.instance().getStorageBean(collectAudioBean.getPortId());
+                    if (storageBean.isMounted()) {
+                        collectAudioBeans.add(collectAudioBean);
+                    }
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
@@ -349,19 +357,23 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         if (DBConfig.isCollectTable(tableName)) {
             videoBeans.addAll(queryCollectVideo(tableName, selection, selectionArgs, allFlag));
         } else {
-            Cursor cursor = null;
-            try {
-                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    do {
-                        // TODO
-                    } while (cursor.moveToNext());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (cursor != null && !cursor.isClosed()) {
-                    cursor.close();
+            int portId = DBConfig.getPortId(tableName);
+            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            if (storageBean.isMounted()) {
+                Cursor cursor = null;
+                try {
+                    cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        do {
+                            videoBeans.add(new VideoBean(cursor));
+                        } while (cursor.moveToNext());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
                 }
             }
         }
@@ -375,7 +387,11 @@ public class MediaDbHelper extends SQLiteOpenHelper {
             cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    // TODO
+                    CollectVideoBean collectVideoBean = new CollectVideoBean(cursor);
+                    StorageBean storageBean = StorageManager.instance().getStorageBean(collectVideoBean.getPortId());
+                    if (storageBean.isMounted()) {
+                        collectVideoBeans.add(collectVideoBean);
+                    }
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
@@ -389,27 +405,31 @@ public class MediaDbHelper extends SQLiteOpenHelper {
     }
 
     private ArrayList<ImageBean> queryImage(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
-        ArrayList<ImageBean> imageBean = new ArrayList<ImageBean>();
+        ArrayList<ImageBean> imageBeans = new ArrayList<ImageBean>();
         if (DBConfig.isCollectTable(tableName)) {
-            imageBean.addAll(queryCollectImage(tableName, selection, selectionArgs, allFlag));
+            imageBeans.addAll(queryCollectImage(tableName, selection, selectionArgs, allFlag));
         } else {
-            Cursor cursor = null;
-            try {
-                cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    do {
-                        // TODO
-                    } while (cursor.moveToNext());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (cursor != null && !cursor.isClosed()) {
-                    cursor.close();
+            int portId = DBConfig.getPortId(tableName);
+            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            if (storageBean.isMounted()) {
+                Cursor cursor = null;
+                try {
+                    cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        do {
+                            imageBeans.add(new ImageBean(cursor));
+                        } while (cursor.moveToNext());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
                 }
             }
         }
-        return imageBean;
+        return imageBeans;
     }
 
     private ArrayList<CollectImageBean> queryCollectImage(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
@@ -420,7 +440,10 @@ public class MediaDbHelper extends SQLiteOpenHelper {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     CollectImageBean collectImageBean = new CollectImageBean(cursor);
-                    // TODO
+                    StorageBean storageBean = StorageManager.instance().getStorageBean(collectImageBean.getPortId());
+                    if (storageBean.isMounted()) {
+                        collectImageBeans.add(collectImageBean);
+                    }
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {
