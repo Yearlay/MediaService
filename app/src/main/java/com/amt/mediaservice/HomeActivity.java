@@ -15,7 +15,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView textView = (TextView) findViewById(R.id.sample_text);
-        textView.setText((new ScanJni()).stringFromJni());
+        textView.setText((new ScanJni(null)).stringFromJni());
     }
 
     /**

@@ -234,7 +234,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         contentValues = mediaBean.getContentValues(contentValues);
         long ret = sqLiteDatabase.insert(tableName, null, contentValues);
         if (ret > 0) {
-            // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
+            notifyChange(tableName);
         }
     }
 
@@ -245,7 +245,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         String[] whereArgs = new String[] {mediaBean.getFilePath()};
         long ret = sqLiteDatabase.delete(tableName, whereClause, whereArgs);
         if (ret > 0) {
-            // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
+            notifyChange(tableName);
         }
     }
 
@@ -258,8 +258,17 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         String[] whereArgs = new String[] {mediaBean.getFilePath()};
         long ret = sqLiteDatabase.update(tableName, contentValues, whereClause, whereArgs);
         if (ret > 0) {
-            // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
+            notifyChange(tableName);
         }
+    }
+
+    /**
+     * 通知内容观察者tableName表数据有变化。
+     * @param tableName
+     */
+    public void notifyChange(String tableName) {
+        // TODO 通知内容观察者tableName表数据有变化。
+        // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
     }
 
     /**
@@ -279,11 +288,14 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(sqlStr);
     }
 
-    public ArrayList<MediaBean> queryMedia(int portId, int fileType) {
-        String tableName = DBConfig.getTableName(portId, fileType);
-        return query(tableName, null, null, false);
-    }
-
+    /**
+     *
+     * @param tableName 表名
+     * @param selection 查询条件
+     * @param selectionArgs 查询列
+     * @param allFlag 是否查询全部数据（true: 不考虑磁盘是否挂载）
+     * @return 媒体列表。
+     */
     public ArrayList<MediaBean> query(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
         ArrayList<MediaBean> mediaBeanList = new ArrayList<MediaBean>();
         if (DBConfig.getFileType(tableName) == FileType.AUDIO) {

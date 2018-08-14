@@ -8,6 +8,7 @@ import com.amt.media.database.MediaDbHelper;
 import com.amt.media.datacache.AllMediaList;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.jni.ScanJni;
+import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
 import com.amt.util.DebugClock;
@@ -80,9 +81,12 @@ public class ScanThread extends Thread {
         int scanState = StorageBean.FILE_SCANNING;
         try {
             // TODO：清空数据库表的内容是临时的做法，需要针对重启设备校验文件来设计方案。
-            int imageCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.IMAGE).size();
-            int audioCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.AUDIO).size();
-            int videoCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.VIDEO).size();
+            int imageCount = mediaDbHelper.query(DBConfig.getTableName(portId, MediaUtil.FileType.IMAGE),
+                    null, null, false).size();
+            int audioCount = mediaDbHelper.query(DBConfig.getTableName(portId, MediaUtil.FileType.AUDIO),
+                    null, null, false).size();
+            int videoCount = mediaDbHelper.query(DBConfig.getTableName(portId, MediaUtil.FileType.VIDEO),
+                    null, null, false).size();
             DebugLog.d(TAG, " Scan check imageCount: " + imageCount
             		+ " && audioCount: " + audioCount + " && videoCount:" + videoCount);
             mediaCount = jniScanRootPath(storagePath, 1);
