@@ -8,6 +8,7 @@ import com.amt.media.database.MediaDbHelper;
 import com.amt.media.datacache.AllMediaList;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.jni.ScanJni;
+import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
 import com.amt.util.DebugClock;
 import com.amt.util.DebugLog;
@@ -77,11 +78,11 @@ public class ScanThread extends Thread {
         }
         int mediaCount = 0;
         int scanState = StorageBean.FILE_SCANNING;
-        /*try {
+        try {
             // TODO：清空数据库表的内容是临时的做法，需要针对重启设备校验文件来设计方案。
-            int imageCount = mediaDbHelper.queryMedia(scanTask.portId, FileType.IMAGE, null, null).size();
-            int audioCount = mediaDbHelper.queryMedia(scanTask.portId, FileType.AUDIO, null, null).size();
-            int videoCount = mediaDbHelper.queryMedia(scanTask.portId, FileType.VIDEO, null, null).size();
+            int imageCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.IMAGE).size();
+            int audioCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.AUDIO).size();
+            int videoCount = mediaDbHelper.queryMedia(portId, MediaUtil.FileType.VIDEO).size();
             DebugLog.d(TAG, " Scan check imageCount: " + imageCount
             		+ " && audioCount: " + audioCount + " && videoCount:" + videoCount);
             mediaCount = jniScanRootPath(storagePath, 1);
@@ -98,7 +99,7 @@ public class ScanThread extends Thread {
         } catch (Exception e) {
             scanState = StorageBean.SCAN_ERROR;
             e.printStackTrace();
-        }*/
+        }
         // FILE_SCAN_OVER 或者是 SCAN_ERROR。
         StorageManager.instance().updateStorageState(portId, scanState);
     }

@@ -279,6 +279,10 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(sqlStr);
     }
 
+    public ArrayList<MediaBean> queryMedia(int portId, int fileType) {
+        String tableName = DBConfig.getTableName(portId, fileType);
+        return query(tableName, null, null, false);
+    }
 
     public ArrayList<MediaBean> query(String tableName, String selection, String[] selectionArgs, boolean allFlag) {
         ArrayList<MediaBean> mediaBeanList = new ArrayList<MediaBean>();
