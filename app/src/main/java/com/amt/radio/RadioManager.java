@@ -7,6 +7,7 @@ import com.amt.aidl.MediaDef;
 import com.amt.aidl.RadioBean;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.service.MediaServiceBinder;
+import com.haoke.define.RadioDef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,9 @@ public class RadioManager {
 
     private ArrayList<RadioBean> mFMRadioDatas = new ArrayList<RadioBean>();
     private ArrayList<RadioBean> mAMRadioDatas = new ArrayList<RadioBean>();
+    private ArrayList<RadioBean> mMCURadioDatas = new ArrayList<RadioBean>();
+
+    private static final int FREQ_COUNT_MAX = 30;
 
     private static RadioManager mSelf;
     synchronized public static RadioManager getInstance() {
@@ -42,6 +46,13 @@ public class RadioManager {
         mRadioCallBack = new RadioCallBack() {
             @Override
             public void onRadioDataChange(int func, int data) {
+                switch (func) {
+                    case RadioDef.RadioFunc.ALL_CH:
+                        updateMCURadioDatas();
+                        break;
+                    default:
+                        break;
+                }
                 if (mBinderCallBack != null) {
                     mBinderCallBack.onRadioCallBack(func, data);
                 }
@@ -284,6 +295,13 @@ public class RadioManager {
     }
 
     /**
+     * 获得所有的FM电台
+     */
+    public ArrayList<RadioBean> getMCURadioDatas() {
+        return mMCURadioDatas;
+    }
+
+    /**
      * 收藏指定的电台（支持批量收藏）
      */
     public void collectRadio(List<RadioBean> radioBeanList) {
@@ -355,5 +373,18 @@ public class RadioManager {
         mRadioDatabaseHelper.clearFM();
         mFMRadioDatas.clear();
         reLoadFMRadioDatas(0);
+    }
+
+    private void updateMCURadioDatas() {
+        mMCURadioDatas.clear();
+        for (int index = 0; index < FREQ_COUNT_MAX; index++) {
+            int freq = getChannel(index);
+            RadioBean radioBean = new RadioBean(null, String.valueOf(freq),
+                    null, RadioBean.RadioType.MCU_TYPE);
+            mMCURadioDatas.add(radioBean);
+        }
+        if (mBinderCallBack != null) {
+            mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.MCU_TYPE);
+        }
     }
 }

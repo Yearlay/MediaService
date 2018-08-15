@@ -16,6 +16,7 @@ public class RadioBean implements Parcelable {
     public class RadioType {
         public static final int FM_TYPE = 1;
         public static final int AM_TYPE = 2;
+        public static final int MCU_TYPE = 3;
     }
     private int radioType;
 
@@ -24,6 +25,13 @@ public class RadioBean implements Parcelable {
     }
 
     public void setRadioType(int radioType) {
+        this.radioType = radioType;
+    }
+
+    public RadioBean(String username, String freq, String name, int radioType) {
+        this.username = username;
+        this.freq = freq;
+        this.name = name;
         this.radioType = radioType;
     }
 

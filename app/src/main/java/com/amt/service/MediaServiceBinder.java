@@ -8,6 +8,7 @@ import com.amt.aidl.IMediaService;
 import com.amt.aidl.MediaDef;
 import com.amt.bt.BtMusicManager;
 import com.amt.aidl.RadioBean;
+import com.amt.radio.RadioManager;
 import com.amt.util.DebugLog;
 import com.amt.util.MediaDefUtil;
 
@@ -179,7 +180,22 @@ public class MediaServiceBinder extends IMediaService.Stub {
 
     @Override
     public List<RadioBean> getRadioDatas(int radioType) throws RemoteException {
-        return  null;
+        RadioManager radioManager = RadioManager.getInstance();
+        List<RadioBean> radioBeanList = null;
+        switch (radioType) {
+            case RadioBean.RadioType.AM_TYPE:
+                radioBeanList = radioManager.getAMRadioDatas();
+                break;
+            case RadioBean.RadioType.FM_TYPE:
+                radioBeanList = radioManager.getFMRadioDatas();
+                break;
+            case RadioBean.RadioType.MCU_TYPE:
+                radioBeanList = radioManager.getMCURadioDatas();
+                break;
+            default:
+                break;
+        }
+        return radioBeanList;
     }
 
     static class MediaClient {
