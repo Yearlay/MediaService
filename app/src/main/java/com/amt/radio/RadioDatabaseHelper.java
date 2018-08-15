@@ -18,7 +18,7 @@ public class RadioDatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DBVERSION);
     }
 
-    public String getTableName(RadioBean radioBean) {
+    public static String getTableName(RadioBean radioBean) {
         return (radioBean.getRadioType() == RadioBean.RadioType.AMType) ?
                 TABLE_NAME_AM : TABLE_NAME_FM;
     }
@@ -44,6 +44,14 @@ public class RadioDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_FM);
         sqLiteDatabase.execSQL(getCreateTableString(TABLE_NAME_AM));
         sqLiteDatabase.execSQL(getCreateTableString(TABLE_NAME_FM));
+    }
+
+    public void clearAM() {
+        getWritableDatabase().execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_AM);
+    }
+
+    public void clearFM() {
+        getWritableDatabase().execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_FM);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.amt.radio;
 import com.amt.mediaservice.MediaApplication;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RadioManager {
 
@@ -170,13 +171,85 @@ public class RadioManager {
         mRadioInstance.setNextChannel();
     }
 
+    /**
+     * 获取所有的FM的频道，存放到mFMRadioDatas中。
+     */
     private void initFMRadioDatas() {
         mFMRadioDatas.clear();
         mFMRadioDatas.addAll(mRadioDatabaseHelper.queryFM(null, null));
     }
 
+    /**
+     * 获取所有的AM的频道，存放到mAMRadioDatas中。
+     */
     private void initAMRadioDatas() {
         mAMRadioDatas.clear();
         mAMRadioDatas.addAll(mRadioDatabaseHelper.queryAM(null, null));
+    }
+
+    /**
+     * 获得所有的AM电台
+     */
+    public ArrayList<RadioBean> getAMRadioDatas() {
+        return mAMRadioDatas;
+    }
+
+    /**
+     * 获得所有的FM电台
+     */
+    public ArrayList<RadioBean> getFMRadioDatas() {
+        return mFMRadioDatas;
+    }
+
+    /**
+     * 收藏指定的电台（支持批量收藏）
+     */
+    public void collectRadio(List<RadioBean> radioBeanList) {
+        for (RadioBean radioBean : radioBeanList) {
+            mRadioDatabaseHelper.insert(radioBean);
+        }
+    }
+
+    /**
+     * 取消收藏指定的电台（支持批量取消）
+     */
+    public void unCollectRadio(List<RadioBean> radioBeanList) {
+        for (RadioBean radioBean : radioBeanList) {
+            mRadioDatabaseHelper.delete(radioBean);
+        }
+    }
+
+    /**
+     * 判断指定的电台是否是收藏电台
+     * @param radioBean
+     * @return
+     */
+    public boolean isCollect(RadioBean radioBean) {
+        boolean retFlag = false;
+        ArrayList<RadioBean> radioBeans = radioBean.getRadioType() == RadioBean.RadioType.AMType ?
+                mAMRadioDatas : mFMRadioDatas;
+        for (RadioBean bean : radioBeans) {
+            if (bean.getFreq() == radioBean.getFreq()) {
+                retFlag = true;
+                break;
+            }
+        }
+        return retFlag;
+    }
+
+    /**
+     * 清空AM电台。
+     */
+    public void clearAMRadios() {
+        mRadioDatabaseHelper.clearAM();
+        mAMRadioDatas.clear();
+    }
+
+    /**
+     * 清空FM电台。
+     */
+    public void clearFMRadios() {
+        mRadioDatabaseHelper.clearFM();
+        mFMRadioDatas.clear();
     }
 }
