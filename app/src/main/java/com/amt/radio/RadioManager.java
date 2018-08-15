@@ -3,8 +3,10 @@ package com.amt.radio;
 import android.os.Handler;
 import android.os.Message;
 
+import com.amt.aidl.MediaDef;
 import com.amt.aidl.RadioBean;
 import com.amt.mediaservice.MediaApplication;
+import com.amt.service.MediaServiceBinder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,40 +14,46 @@ import java.util.List;
 public class RadioManager {
 
     interface RadioCallBack {
-        void onRadioDataChange(int mode, int func, int data);
-    }
-
-    interface RadioLoadListener {
-        void onRadioLoadCompleted(int radioType);
+        void onRadioDataChange(int func, int data);
     }
 
     private RadioInterface mRadioInstance;
     private RadioCallBack mRadioCallBack;
+    private MediaServiceBinder.ManagerCallBack mBinderCallBack;
     private RadioDatabaseHelper mRadioDatabaseHelper;
-    private ArrayList<RadioLoadListener> mLoadListenerList = new ArrayList<RadioLoadListener>();
 
     private ArrayList<RadioBean> mFMRadioDatas = new ArrayList<RadioBean>();
     private ArrayList<RadioBean> mAMRadioDatas = new ArrayList<RadioBean>();
 
-    public RadioManager() {
+    private static RadioManager mSelf;
+    synchronized public static RadioManager getInstance() {
+        if (mSelf == null) {
+            mSelf = new RadioManager();
+        }
+        return mSelf;
+    }
+
+    public static void registerCallBack(MediaServiceBinder.ManagerCallBack callBack) {
+        getInstance().mBinderCallBack = callBack;
+    }
+
+    private RadioManager() {
         mRadioInstance = Radio_Haoke.getInstance();
         mRadioCallBack = new RadioCallBack() {
             @Override
-            public void onRadioDataChange(int mode, int func, int data) {
-                // TODO
+            public void onRadioDataChange(int func, int data) {
+                if (mBinderCallBack != null) {
+                    mBinderCallBack.onRadioCallBack(func, data);
+                }
             }
         };
         mRadioInstance.setCallBack(mRadioCallBack);
 
         mRadioDatabaseHelper = new RadioDatabaseHelper(MediaApplication.getInstance());
-    }
 
-    public void registerLoadListener(RadioLoadListener listener) {
-        mLoadListenerList.add(listener);
-    }
-
-    public void unRegisterLoadListener(RadioLoadListener listener) {
-        mLoadListenerList.remove(listener);
+        // 初始化数据。
+        reLoadFMRadioDatas(0);
+        reLoadAMRadioDatas(0);
     }
 
     /**
@@ -235,8 +243,8 @@ public class RadioManager {
                 case END_LOAD_FM_DATA:
                     mFMRadioDatas.clear();
                     mFMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
-                    for (RadioLoadListener radioLoadListener : mLoadListenerList) {
-                        radioLoadListener.onRadioLoadCompleted(RadioBean.RadioType.FM_TYPE);
+                    if (mBinderCallBack != null) {
+                        mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.FM_TYPE);
                     }
                     break;
                 case BEGIN_LOAD_AM_DATA:
@@ -251,8 +259,8 @@ public class RadioManager {
                 case END_LOAD_AM_DATA:
                     mAMRadioDatas.clear();
                     mAMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
-                    for (RadioLoadListener radioLoadListener : mLoadListenerList) {
-                        radioLoadListener.onRadioLoadCompleted(RadioBean.RadioType.AM_TYPE);
+                    if (mBinderCallBack != null) {
+                        mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.AM_TYPE);
                     }
                     break;
                 default:

@@ -25,5 +25,6 @@ interface IMediaService {
     List<String> funcListSEx(int funcID, int arg1, int arg2, int arg3);
 
     //int funcIntLSS(int funcID, in List<String, String> list);
+
     List<RadioBean> getRadioDatas(int radioType);
 }

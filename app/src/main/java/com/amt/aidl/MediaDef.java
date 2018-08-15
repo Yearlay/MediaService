@@ -59,6 +59,8 @@ public class MediaDef {
     public static final int CALLBACK_FLAG_IMAGE = 0x10;
     public static final int CALLBACK_FLAG_OTHER = 0x20;
 
+    public static final int CALLBACK_RADIO_DB_LOAD = 0x60;
+
     // 错误代码
     public static final int ERROR_CODE_UNKNOWN = 10000;
     // ------- 公共

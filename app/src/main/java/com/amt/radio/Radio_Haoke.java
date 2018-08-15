@@ -32,7 +32,7 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
             @Override
             public void onDataChange(int mode, int func, int data) throws RemoteException {
                 if (mCallBack != null) {
-                    mCallBack.onRadioDataChange(mode, func, data);
+                    mCallBack.onRadioDataChange(func, data);
                 }
             }
         };
