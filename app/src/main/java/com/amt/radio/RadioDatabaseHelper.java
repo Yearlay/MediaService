@@ -19,7 +19,7 @@ public class RadioDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public static String getTableName(RadioBean radioBean) {
-        return (radioBean.getRadioType() == RadioBean.RadioType.AMType) ?
+        return (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE) ?
                 TABLE_NAME_AM : TABLE_NAME_FM;
     }
 

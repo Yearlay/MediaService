@@ -1,5 +1,8 @@
 package com.amt.radio;
 
+import android.os.Handler;
+import android.os.Message;
+
 import com.amt.mediaservice.MediaApplication;
 
 import java.util.ArrayList;
@@ -11,9 +14,14 @@ public class RadioManager {
         void onRadioDataChange(int mode, int func, int data);
     }
 
+    interface RadioLoadListener {
+        void onRadioLoadCompleted(int radioType);
+    }
+
     private RadioInterface mRadioInstance;
     private RadioCallBack mRadioCallBack;
     private RadioDatabaseHelper mRadioDatabaseHelper;
+    private ArrayList<RadioLoadListener> mLoadListenerList = new ArrayList<RadioLoadListener>();
 
     private ArrayList<RadioBean> mFMRadioDatas = new ArrayList<RadioBean>();
     private ArrayList<RadioBean> mAMRadioDatas = new ArrayList<RadioBean>();
@@ -29,6 +37,14 @@ public class RadioManager {
         mRadioInstance.setCallBack(mRadioCallBack);
 
         mRadioDatabaseHelper = new RadioDatabaseHelper(MediaApplication.getInstance());
+    }
+
+    public void registerLoadListener(RadioLoadListener listener) {
+        mLoadListenerList.add(listener);
+    }
+
+    public void unRegisterLoadListener(RadioLoadListener listener) {
+        mLoadListenerList.remove(listener);
     }
 
     /**
@@ -174,18 +190,75 @@ public class RadioManager {
     /**
      * 获取所有的FM的频道，存放到mFMRadioDatas中。
      */
-    private void initFMRadioDatas() {
-        mFMRadioDatas.clear();
-        mFMRadioDatas.addAll(mRadioDatabaseHelper.queryFM(null, null));
+    public void reLoadFMRadioDatas(int delayTime) {
+        mLoadHandler.removeMessages(BEGIN_LOAD_FM_DATA);
+        Message message = mLoadHandler.obtainMessage(BEGIN_LOAD_FM_DATA);
+        if (delayTime == 0) {
+            mLoadHandler.sendMessage(message);
+        } else {
+            mLoadHandler.sendMessageDelayed(message, delayTime);
+        }
     }
 
     /**
      * 获取所有的AM的频道，存放到mAMRadioDatas中。
      */
-    private void initAMRadioDatas() {
-        mAMRadioDatas.clear();
-        mAMRadioDatas.addAll(mRadioDatabaseHelper.queryAM(null, null));
+    public void reLoadAMRadioDatas(int delayTime) {
+        mLoadHandler.removeMessages(BEGIN_LOAD_AM_DATA);
+        Message message = mLoadHandler.obtainMessage(BEGIN_LOAD_AM_DATA);
+        if (delayTime == 0) {
+            mLoadHandler.sendMessage(message);
+        } else {
+            mLoadHandler.sendMessageDelayed(message, delayTime);
+        }
     }
+
+    private static final int BEGIN_LOAD_FM_DATA = 1;
+    private static final int END_LOAD_FM_DATA = 2;
+    private static final int BEGIN_LOAD_AM_DATA = 3;
+    private static final int END_LOAD_AM_DATA = 4;
+    private Handler mLoadHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case BEGIN_LOAD_FM_DATA:
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ArrayList<RadioBean> radioBeans = mRadioDatabaseHelper.queryFM(null, null);
+                            mLoadHandler.obtainMessage(END_LOAD_FM_DATA, radioBeans).sendToTarget();
+                        }
+                    }).start();
+                    break;
+                case END_LOAD_FM_DATA:
+                    mFMRadioDatas.clear();
+                    mFMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
+                    for (RadioLoadListener radioLoadListener : mLoadListenerList) {
+                        radioLoadListener.onRadioLoadCompleted(RadioBean.RadioType.FM_TYPE);
+                    }
+                    break;
+                case BEGIN_LOAD_AM_DATA:
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ArrayList<RadioBean> radioBeans = mRadioDatabaseHelper.queryAM(null, null);
+                            mLoadHandler.obtainMessage(END_LOAD_AM_DATA, radioBeans).sendToTarget();
+                        }
+                    }).start();
+                    break;
+                case END_LOAD_AM_DATA:
+                    mAMRadioDatas.clear();
+                    mAMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
+                    for (RadioLoadListener radioLoadListener : mLoadListenerList) {
+                        radioLoadListener.onRadioLoadCompleted(RadioBean.RadioType.AM_TYPE);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     /**
      * 获得所有的AM电台
@@ -205,8 +278,18 @@ public class RadioManager {
      * 收藏指定的电台（支持批量收藏）
      */
     public void collectRadio(List<RadioBean> radioBeanList) {
+        boolean updateAMFlag = false;
+        boolean updateFMFlag = false;
         for (RadioBean radioBean : radioBeanList) {
+            updateAMFlag = updateAMFlag || (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE);
+            updateFMFlag = updateFMFlag || (radioBean.getRadioType() == RadioBean.RadioType.FM_TYPE);
             mRadioDatabaseHelper.insert(radioBean);
+        }
+        if (updateAMFlag) {
+            reLoadAMRadioDatas(0);
+        }
+        if (updateFMFlag) {
+            reLoadFMRadioDatas(0);
         }
     }
 
@@ -214,8 +297,18 @@ public class RadioManager {
      * 取消收藏指定的电台（支持批量取消）
      */
     public void unCollectRadio(List<RadioBean> radioBeanList) {
+        boolean updateAMFlag = false;
+        boolean updateFMFlag = false;
         for (RadioBean radioBean : radioBeanList) {
+            updateAMFlag = updateAMFlag || (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE);
+            updateFMFlag = updateFMFlag || (radioBean.getRadioType() == RadioBean.RadioType.FM_TYPE);
             mRadioDatabaseHelper.delete(radioBean);
+        }
+        if (updateAMFlag) {
+            reLoadAMRadioDatas(0);
+        }
+        if (updateFMFlag) {
+            reLoadFMRadioDatas(0);
         }
     }
 
@@ -226,7 +319,7 @@ public class RadioManager {
      */
     public boolean isCollect(RadioBean radioBean) {
         boolean retFlag = false;
-        ArrayList<RadioBean> radioBeans = radioBean.getRadioType() == RadioBean.RadioType.AMType ?
+        ArrayList<RadioBean> radioBeans = radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE ?
                 mAMRadioDatas : mFMRadioDatas;
         for (RadioBean bean : radioBeans) {
             if (bean.getFreq() == radioBean.getFreq()) {
@@ -243,6 +336,7 @@ public class RadioManager {
     public void clearAMRadios() {
         mRadioDatabaseHelper.clearAM();
         mAMRadioDatas.clear();
+        reLoadAMRadioDatas(0);
     }
 
     /**
@@ -251,5 +345,6 @@ public class RadioManager {
     public void clearFMRadios() {
         mRadioDatabaseHelper.clearFM();
         mFMRadioDatas.clear();
+        reLoadFMRadioDatas(0);
     }
 }

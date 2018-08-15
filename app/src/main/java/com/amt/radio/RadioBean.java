@@ -11,17 +11,17 @@ public class RadioBean {
     public static final String FIELD_NAME = "name";
     private String name;
 
-    enum RadioType {
-        FMType,
-        AMType,
+    public class RadioType {
+        public static final int FM_TYPE = 1;
+        public static final int AM_TYPE = 2;
     }
-    RadioType radioType;
+    private int radioType;
 
-    public RadioType getRadioType() {
+    public int getRadioType() {
         return radioType;
     }
 
-    public void setRadioType(RadioType radioType) {
+    public void setRadioType(int radioType) {
         this.radioType = radioType;
     }
 
