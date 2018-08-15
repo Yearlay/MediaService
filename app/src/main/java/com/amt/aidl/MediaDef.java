@@ -7,6 +7,7 @@ package com.amt.aidl;
 public class MediaDef {
 
     // 蓝牙音乐
+    public static final int FUNC_BTMUSIC = 100; // 蓝牙音乐函数ID起点
     public static final int FUNC_BTMUSIC_ISBTMUSICCONNECTED = 101;
     public static final int FUNC_BTMUSIC_ISBTCONNECTED = 102;
     public static final int FUNC_BTMUSIC_PLAY = 111;
@@ -35,6 +36,34 @@ public class MediaDef {
         }
     }
 
-    //
+    // 收音
+    public static final int FUNC_RADIO = 200; // 收音函数ID起点
+
+    // 本地音乐
+    public static final int FUNC_AUDIO = 300; // 本地音乐函数ID起点
+
+    // 视频
+    public static final int FUNC_VIDEO = 400; // 视频函数ID起点
+
+    // 图片
+    public static final int FUNC_IMAGE = 500; // 图片函数ID起点
+
+    public static final int FUNC_ERROR = 600; // 所有的函数ID终点
+
+    // 回调FLAG
+    public static final int CALLBACK_FLAG_ALL = 0x0;
+    public static final int CALLBACK_FLAG_BT_MUSIC = 0x1;
+    public static final int CALLBACK_FLAG_RADIO = 0x2;
+    public static final int CALLBACK_FLAG_AUDIO = 0x4;
+    public static final int CALLBACK_FLAG_VIDEO = 0x8;
+    public static final int CALLBACK_FLAG_IMAGE = 0x10;
+    public static final int CALLBACK_FLAG_OTHER = 0x20;
+
+    // 错误代码
+    public static final int ERROR_CODE_UNKNOWN = 10000;
+    // ------- 公共
+    public static final int ERROR_FILE_NOT_EXIST = 10001; // 文件不存在
+    // ------- 蓝牙音乐
+    public static final int ERROR_BT_DISCONNECTED = 11001; // 蓝牙未连接
 
 }
