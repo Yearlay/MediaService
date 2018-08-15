@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.amt.bt.BtMusicManager;
+import com.amt.radio.RadioManager;
+
 /**
  * Created by archermind on 2018/8/13.
  */
@@ -15,15 +18,20 @@ public class MediaService extends Service {
     public static final String KEY_COMMAND_FROM = "isfrom";
     public static final int VALUE_FROM_SCAN = 1;
 
+    private MediaServiceBinder mBinder = null;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        BtMusicManager.getInstance();
+        mBinder = new MediaServiceBinder();
     }
 
     @Override

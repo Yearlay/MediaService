@@ -12,43 +12,43 @@ interface BtMusicInterface {
     /**
      * 获取连接状态avrcp和a2dp协议
       */
-    boolean isBtMusicConnected();
+    int isBtMusicConnected();
     /**
      * 获取连接状态hfp协议
      */
-    boolean isBtConnected();
+    int isBtConnected();
     /**
      * 打开通道
      */
-    boolean open();
+    int open();
     /**
      * 关闭通道
      */
-    boolean close();
+    int close();
     /**
      * 播放
      */
-    boolean play();
+    int play();
     /**
      * 暂停
      */
-    boolean pause();
+    int pause();
     /**
      * 停止
      */
-    boolean stop();
+    int stop();
     /**
      * 上一曲
      */
-    boolean prev();
+    int prev();
     /**
      * 下一曲
      */
-    boolean next();
+    int next();
     /**
      * 播放状态
      */
-    boolean isPlaying();
+    int isPlaying();
     /**
      * 获取歌曲标题
      */

@@ -76,7 +76,8 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
      * 获取连接状态avrcp和a2dp协议
      */
     @Override
-    public boolean isBtMusicConnected() {
+    public int isBtMusicConnected() {
+        int code = MediaDef.BtMusicDef.ConnectState.DISCONNECTED;
         boolean enable = false;
         boolean connected = false;
         try {
@@ -84,61 +85,65 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
             if (enable) {
                 int avrcp = mServiceIF.getAvrcpState();
                 int a2dp = mServiceIF.getA2dpState();
-                connected = (avrcp == CONNECTED) && (a2dp == CONNECTED);
+                if ((avrcp == CONNECTED) && (a2dp == CONNECTED)) {
+                    code = MediaDef.BtMusicDef.ConnectState.CONNECTED;
+                } else if (avrcp == CONNECTING || a2dp == CONNECTING) {
+                    code = MediaDef.BtMusicDef.ConnectState.CONNECTING;
+                }
             }
         } catch (Exception e) {
             DebugLog.e(TAG, "isBtMusicConnected e="+e);
         }
-        DebugLog.d(TAG, "isBtMusicConnected enable="+enable+";connected="+connected);
-        return connected;
+        DebugLog.d(TAG, "isBtMusicConnected enable="+enable+";code="+code);
+        return code;
     }
 
     /**
      * 获取连接状态hfp协议
      */
     @Override
-    public boolean isBtConnected() {
+    public int isBtConnected() {
         try {
-            return mServiceIF.getConnState() == CONNECTED;
+            return mServiceIF.getConnState();
         } catch (Exception e) {
             DebugLog.e(TAG, "isBtConnected e="+e);
         }
-        return false;
+        return DISCONNECTED;
     }
 
     /**
      * 打开通道
      */
     @Override
-    public boolean open() {
+    public int open() {
         try {
             DebugLog.v(TAG, "open()");
             mServiceIF.music_open();
         } catch (Exception e) {
             DebugLog.e(TAG, "open e="+e);
         }
-        return true;
+        return 0;
     }
 
     /**
      * 关闭通道
      */
     @Override
-    public boolean close() {
+    public int close() {
         try {
             DebugLog.v(TAG, "close()");
             mServiceIF.music_open();
         } catch (Exception e) {
             DebugLog.e(TAG, "close e="+e);
         }
-        return true;
+        return 0;
     }
 
     /**
      * 播放
      */
     @Override
-    public boolean play() {
+    public int play() {
         try {
             //if (MediaInterfaceUtil.mediaCannotPlay()) {
             //    return;
@@ -154,28 +159,28 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
         } catch (Exception e) {
             DebugLog.e(TAG, "play e=" + e.getMessage());
         }
-        return true;
+        return 0;
     }
 
     /**
      * 暂停
      */
     @Override
-    public boolean pause() {
+    public int pause() {
         try {
             DebugLog.v(TAG, "pause()");
             mServiceIF.music_pause();
         } catch (Exception e) {
             DebugLog.e(TAG, "pause e=" + e.getMessage());
         }
-        return true;
+        return 0;
     }
 
     /**
      * 停止
      */
     @Override
-    public boolean stop() {
+    public int stop() {
         try {
             DebugLog.v(TAG, "stop(), but use music_pause!");
             close();
@@ -183,14 +188,14 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
         } catch (Exception e) {
             DebugLog.e(TAG, "stop e=" + e.getMessage());
         }
-        return true;
+        return 0;
     }
 
     /**
      * 上一曲
      */
     @Override
-    public boolean prev() {
+    public int prev() {
         try {
             //if (MediaInterfaceUtil.mediaCannotPlay()) {
             //    return;
@@ -205,14 +210,14 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
         } catch (Exception e) {
             DebugLog.e(TAG, "pre e=" + e.getMessage());
         }
-        return true;
+        return 0;
     }
 
     /**
      * 下一曲
      */
     @Override
-    public boolean next() {
+    public int next() {
         try {
 //            if (MediaInterfaceUtil.mediaCannotPlay()) {
 //                return;
@@ -227,18 +232,20 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
         } catch (Exception e) {
             DebugLog.e(TAG, "next e=" + e.getMessage());
         }
-        return true;
+        return 0;
     }
 
     /**
      * 播放状态
      */
     @Override
-    public boolean isPlaying() {
-        boolean isPlaying = false;
+    public int isPlaying() {
+        int isPlaying = MediaDef.BtMusicDef.PlayState.PAUSE;
         try {
-            if (isBtMusicConnected()) {
-                isPlaying = mServiceIF.music_isPlaying();
+            if (isBtMusicConnected() == CONNECTED) {
+                isPlaying = mServiceIF.music_isPlaying() ?
+                        MediaDef.BtMusicDef.PlayState.PLAYING
+                        : MediaDef.BtMusicDef.PlayState.PAUSE;
             }
         } catch (Exception e) {
             DebugLog.e(TAG, "isPlaying e=" + e.getMessage());
