@@ -1,9 +1,11 @@
-package com.amt.radio;
+package com.amt.aidl;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class RadioBean {
+public class RadioBean implements Parcelable {
     public static final String FIELD_USERNAME = "username";
     private String username;
     public static final String FIELD_FREQ = "freq";
@@ -61,5 +63,37 @@ public class RadioBean {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    protected RadioBean(Parcel in) {
+        username = in.readString();
+        freq = in.readString();
+        name = in.readString();
+        radioType = in.readInt();
+    }
+
+    public static final Creator<RadioBean> CREATOR = new Creator<RadioBean>() {
+        @Override
+        public RadioBean createFromParcel(Parcel in) {
+            return new RadioBean(in);
+        }
+
+        @Override
+        public RadioBean[] newArray(int size) {
+            return new RadioBean[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(username);
+        parcel.writeString(freq);
+        parcel.writeString(name);
+        parcel.writeInt(radioType);
     }
 }

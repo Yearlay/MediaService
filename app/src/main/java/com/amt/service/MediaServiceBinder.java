@@ -7,6 +7,7 @@ import com.amt.aidl.IMediaCallBack;
 import com.amt.aidl.IMediaService;
 import com.amt.aidl.MediaDef;
 import com.amt.bt.BtMusicManager;
+import com.amt.aidl.RadioBean;
 import com.amt.util.DebugLog;
 import com.amt.util.MediaDefUtil;
 
@@ -174,6 +175,11 @@ public class MediaServiceBinder extends IMediaService.Stub {
     @Override
     public List<String> funcListSEx(int funcID, int arg1, int arg2, int arg3) throws RemoteException {
         return null;
+    }
+
+    @Override
+    public List<RadioBean> getRadioDatas(int radioType) throws RemoteException {
+        return  null;
     }
 
     static class MediaClient {

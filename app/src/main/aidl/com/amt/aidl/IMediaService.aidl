@@ -2,6 +2,7 @@
 package com.amt.aidl;
 
 import com.amt.aidl.IMediaCallBack;
+import com.amt.aidl.RadioBean;
 
 interface IMediaService {
 
@@ -24,5 +25,5 @@ interface IMediaService {
     List<String> funcListSEx(int funcID, int arg1, int arg2, int arg3);
 
     //int funcIntLSS(int funcID, in List<String, String> list);
-
+    List<RadioBean> getRadioDatas(int radioType);
 }

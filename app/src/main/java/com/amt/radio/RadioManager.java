@@ -3,6 +3,7 @@ package com.amt.radio;
 import android.os.Handler;
 import android.os.Message;
 
+import com.amt.aidl.RadioBean;
 import com.amt.mediaservice.MediaApplication;
 
 import java.util.ArrayList;
