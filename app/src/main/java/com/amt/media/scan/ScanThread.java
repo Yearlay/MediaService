@@ -55,6 +55,8 @@ public class ScanThread extends Thread {
         while (mTaskList.size() > 0) {
             doDeviceTasks();
         }
+        // ScanThread线程结束，需要启动ID3线程进行ID3解析操作。
+        ScanManager.instance().beginID3Parse();
     }
     
     private void doDeviceTasks() {
