@@ -19,6 +19,7 @@ import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.MediaUtil.FileType;
+import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 
 import java.util.ArrayList;
@@ -43,9 +44,9 @@ public class MediaDbHelper extends SQLiteOpenHelper {
     }
 
     private static MediaDbHelper sMediaDbHelper = null;
-    public static MediaDbHelper instance(Context context) {
+    public static MediaDbHelper instance() {
         if (sMediaDbHelper == null) {
-            sMediaDbHelper = new MediaDbHelper(context.getApplicationContext());
+            sMediaDbHelper = new MediaDbHelper(MediaApplication.getInstance());
         }
         return sMediaDbHelper;
     }
