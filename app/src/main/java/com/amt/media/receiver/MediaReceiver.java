@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.amt.media.scan.ScanUtil;
+import com.amt.media.scan.ScanManager;
 import com.amt.service.MediaService;
 import com.amt.util.DebugLog;
 import com.amt.media.util.StorageConfig;
@@ -39,7 +39,7 @@ public class MediaReceiver extends BroadcastReceiver {
             } else if (StorageConfig.USB2_STORAGE_PATH.equals(storagePath)) {
                 sUsb2Mounted = true;
             }
-            startFileService(context, ScanUtil.SCAN_STORAGE, storagePath);
+            startFileService(context, ScanManager.SCAN_STORAGE, storagePath);
         } else if (action.equals(Intent.ACTION_MEDIA_EJECT) || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
             if (StorageConfig.USB1_STORAGE_PATH.equals(storagePath)) {
                 if (!sUsb1Mounted) {
@@ -52,7 +52,7 @@ public class MediaReceiver extends BroadcastReceiver {
                 }
                 sUsb2Mounted = false;
             }
-            startFileService(context, ScanUtil.REMOVE_STORAGE, storagePath);
+            startFileService(context, ScanManager.REMOVE_STORAGE, storagePath);
         }
 
     }
@@ -60,8 +60,8 @@ public class MediaReceiver extends BroadcastReceiver {
     private void startFileService(Context context, int scanType, String storagePath) {
         Intent intents = new Intent(context, MediaService.class);
         intents.putExtra(MediaService.KEY_COMMAND_FROM, MediaService.VALUE_FROM_SCAN);
-        intents.putExtra(ScanUtil.SCAN_TYPE_KEY, scanType);
-        intents.putExtra(ScanUtil.SCAN_FILE_PATH, storagePath);
+        intents.putExtra(ScanManager.SCAN_TYPE_KEY, scanType);
+        intents.putExtra(ScanManager.SCAN_FILE_PATH, storagePath);
         context.startService(intents);
     }
 }

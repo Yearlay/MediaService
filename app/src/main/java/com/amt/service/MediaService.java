@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.amt.bt.BtMusicManager;
+import com.amt.media.scan.ScanManager;
 import com.amt.radio.RadioManager;
 
 /**
@@ -40,6 +41,7 @@ public class MediaService extends Service {
             int fromValue = intent.getIntExtra(KEY_COMMAND_FROM, 0);
             switch (fromValue) {
                 case VALUE_FROM_SCAN:
+                    ScanManager.instance().operateIntent(intent);
                     break;
                 default:
                     break;
