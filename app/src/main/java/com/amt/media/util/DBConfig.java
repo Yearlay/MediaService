@@ -67,6 +67,18 @@ public class DBConfig {
         return tableName;
     }
 
+    public static String getCollectTableName(int fileType) {
+        String tableName = null;
+        if (fileType == MediaUtil.FileType.AUDIO) {
+            tableName = DBTable.COLLECT_AUDIO;
+        } else if (fileType == MediaUtil.FileType.VIDEO) {
+            tableName = DBTable.COLLECT_VIDEO;
+        } else if (fileType == MediaUtil.FileType.IMAGE) {
+            tableName = DBTable.COLLECT_IMAGE;
+        }
+        return tableName;
+    }
+
     public static String getTableName(MediaBean mediaBean) {
         String tableName = null;
         if (mediaBean instanceof CollectAudioBean ||
