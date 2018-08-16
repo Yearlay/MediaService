@@ -1,4 +1,3 @@
-// IMediaService.aidl
 package com.amt.aidl;
 
 import com.amt.aidl.IMediaCallBack;
@@ -9,7 +8,7 @@ interface IMediaService {
     boolean registerCallBack(String appName, int callBackFlag, IMediaCallBack callBack);
     boolean unregisterCallBack(String appName);
 
-    // 函数名规范：func + 返回值类型 [ + 参数类型首字母 ... + Ex(参数个数扩展,int类型)]
+    // 函数名规范：func [ + 特殊模块名 ] + 返回值类型 [ + 参数类型首字母 ... + Ex(参数个数扩展,int类型)]
 
     boolean funcBool(int funcID);
     long funcLong(int funcID);
@@ -24,7 +23,6 @@ interface IMediaService {
 
     List<String> funcListSEx(int funcID, int arg1, int arg2, int arg3);
 
-    //int funcIntLSS(int funcID, in List<String, String> list);
-
-    List<RadioBean> getRadioDatas(int radioType);
+    int funcRadioIntR(int funcID, in RadioBean radioBean);
+    int funcRadioIntLR(int funcID, inout List<RadioBean> list);
 }

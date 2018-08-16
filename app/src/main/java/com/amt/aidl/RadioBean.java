@@ -13,26 +13,39 @@ public class RadioBean implements Parcelable {
     public static final String FIELD_NAME = "name";
     private String name;
 
-    public class RadioType {
-        public static final int FM_TYPE = 1;
-        public static final int AM_TYPE = 2;
-        public static final int MCU_TYPE = 3;
-    }
-    private int radioType;
+    private boolean isFmFreq;
 
-    public int getRadioType() {
-        return radioType;
+    private RadioBean() {
     }
 
-    public void setRadioType(int radioType) {
-        this.radioType = radioType;
+    public RadioBean(boolean bFmFreq, Cursor cursor) {
+        this.isFmFreq = bFmFreq;
+        username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));
+        freq = cursor.getString(cursor.getColumnIndex(FIELD_FREQ));
+        name = cursor.getString(cursor.getColumnIndex(FIELD_NAME));
     }
 
-    public RadioBean(String username, String freq, String name, int radioType) {
+    public RadioBean(String username, String freq, String name, boolean bFmFreq) {
         this.username = username;
         this.freq = freq;
         this.name = name;
-        this.radioType = radioType;
+        this.isFmFreq = bFmFreq;
+    }
+
+    public boolean isAmFreq() {
+        return !isFmFreq;
+    }
+
+    public boolean isFmFreq() {
+        return isFmFreq;
+    }
+
+    public void setFmFreq() {
+        this.isFmFreq = true;
+    }
+
+    public void setAmFreq() {
+        this.isFmFreq = false;
     }
 
     public ContentValues getContentValues() {
@@ -41,12 +54,6 @@ public class RadioBean implements Parcelable {
         contentValues.put(FIELD_FREQ, freq);
         contentValues.put(FIELD_NAME, name);
         return contentValues;
-    }
-
-    public RadioBean(Cursor cursor) {
-        username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));
-        freq = cursor.getString(cursor.getColumnIndex(FIELD_FREQ));
-        name = cursor.getString(cursor.getColumnIndex(FIELD_NAME));
     }
 
     public String getUsername() {
@@ -77,7 +84,7 @@ public class RadioBean implements Parcelable {
         username = in.readString();
         freq = in.readString();
         name = in.readString();
-        radioType = in.readInt();
+        isFmFreq = in.readInt() == 1 ? true : false;
     }
 
     public static final Creator<RadioBean> CREATOR = new Creator<RadioBean>() {
@@ -102,6 +109,6 @@ public class RadioBean implements Parcelable {
         parcel.writeString(username);
         parcel.writeString(freq);
         parcel.writeString(name);
-        parcel.writeInt(radioType);
+        parcel.writeInt(isFmFreq ? 1 : 0);
     }
 }

@@ -1,6 +1,5 @@
 package com.amt.bt;
 
-import com.amt.aidl.IMediaCallBack;
 import com.amt.aidl.MediaDef;
 import com.amt.service.MediaServiceBinder;
 
@@ -93,15 +92,6 @@ public class BtMusicManager {
         }
         return code;
     }
-
-    public boolean registerCallBack(String mode, IMediaCallBack callBack) {
-        return true;
-    }
-
-    boolean unregisterCallBack(String mode) {
-        return true;
-    }
-
 
     /**
      * 获取连接状态avrcp和a2dp协议

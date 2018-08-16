@@ -21,7 +21,7 @@ public class RadioDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public static String getTableName(RadioBean radioBean) {
-        return (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE) ?
+        return radioBean.isAmFreq() ?
                 TABLE_NAME_AM : TABLE_NAME_FM;
     }
 
@@ -110,12 +110,13 @@ public class RadioDatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<RadioBean> query(String tableName, String selection, String[] selectionArgs) {
         ArrayList<RadioBean> radioBeans = new ArrayList<RadioBean>();
         Cursor cursor = null;
+        boolean isFmFreq = TABLE_NAME_FM.equals(tableName);
         try {
             cursor = getReadableDatabase().query(tableName, null, selection, selectionArgs,
                     null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    radioBeans.add(new RadioBean(cursor));
+                    radioBeans.add(new RadioBean(isFmFreq, cursor));
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {

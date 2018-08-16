@@ -32,17 +32,17 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
                     int msg = 0;
                     switch (func) {
                         case BTDef.BTFunc.CONN_STATE://101
-                            msg = MediaDef.BtMusicDef.MSG_CONNECT_STATE;
+                            msg = MediaDef.BtMusicDef.CALLBACK_CONNECT_STATE;
                             break;
                         //case BTDef.BTFunc.MUSIC_A2DP_STATE:  //404，声音传输
                         case BTDef.BTFunc.MUSIC_AVRCP_STATE:  //405,蓝牙控制
-                            msg = MediaDef.BtMusicDef.MSG_MUSIC_CONNECT_STATE;
+                            msg = MediaDef.BtMusicDef.CALLBACK_MUSIC_CONNECT_STATE;
                             break;
                         case BTDef.BTFunc.MUSIC_PLAY_STATE://400
-                            msg = MediaDef.BtMusicDef.MSG_PLAY_STATE;
+                            msg = MediaDef.BtMusicDef.CALLBACK_PLAY_STATE;
                             break;
                         case BTDef.BTFunc.MUSIC_ID3_UPDATE://401
-                            msg = MediaDef.BtMusicDef.MSG_ID3_UPDATE;
+                            msg = MediaDef.BtMusicDef.CALLBACK_ID3_UPDATE;
                             break;
                     }
                     mCallBack.callback(msg, data);
