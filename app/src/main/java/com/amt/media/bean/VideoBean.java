@@ -53,4 +53,8 @@ public class VideoBean extends MediaBean {
     public void setPlayTime(int playTime) {
         this.playTime = playTime;
     }
+
+    public void parseID3() {
+
+    }
 }

@@ -1,7 +1,19 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
+
+import com.amt.media.datacache.StorageManager;
+import com.amt.media.util.PingYingTool;
+import com.amt.media.util.StorageConfig;
+import com.amt.mediaservice.MediaApplication;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -152,5 +164,73 @@ public class AudioBean extends MediaBean {
 
     public void setPlayTime(int playTime) {
         this.playTime = playTime;
+    }
+
+    public void parseID3() {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        FileInputStream is = null;
+        try {
+            File file = new File(getFilePath());
+            if (file.exists()) {
+                is = new FileInputStream(getFilePath());
+                FileDescriptor fd = is.getFD();
+                retriever.setDataSource(fd);
+
+                if (getId3Flag() == 0) {
+                    String title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                    if (title != null && !title.equals("")) {
+                        setTitle(title);
+                    }
+                    setArtist(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+                    setAlbum(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM));
+                    setComposer(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER));
+                    setGenre(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE));
+                    String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    if (duration != null && !duration.equals("")) {
+                        setDuration(Integer.valueOf(duration));
+                    }
+                    if (title != null) {
+                        String py = PingYingTool.parseString(title);
+                        setTitlePY(py);
+                    }
+                    if (getArtist() != null) {
+                        String py = PingYingTool.parseString(getArtist());
+                        if (py != null && py.length() > 0) {
+                            py = py.toUpperCase();
+                            setArtistPY(py);
+                        }
+                    }
+                    if (getAlbum() != null) {
+                        String py = PingYingTool.parseString(getAlbum());
+                        if (py != null && py.length() > 0) {
+                            py = py.toUpperCase();
+                            setAlbumPY(py);
+                        }
+                    }
+                    // 如果Thumbnail存在，不用通过MMR解析。
+                    // Thumbnail不存在，就通过MMR解析，解析成功才设置mThumbnailPath。
+                    String bitmapPath = StorageConfig.getStoragePath(getPortId()) +
+                            "/.geelyCache/" + getMD5Str(is);
+                    if (saveBitmap(bitmapPath, retriever)) {
+                        thumbnailPath = bitmapPath;
+                    } else {
+                        thumbnailPath = null;
+                    }
+                    setId3Flag(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            setId3Flag(-1);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            retriever.release();
+        }
     }
 }

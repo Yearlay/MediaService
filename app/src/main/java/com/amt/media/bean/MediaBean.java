@@ -2,9 +2,17 @@ package com.amt.media.bean;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 
+import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.util.Date;
@@ -237,5 +245,101 @@ public class MediaBean {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public void parseID3() {
+
+    }
+
+    protected String getMD5Str(FileInputStream is)
+            throws NoSuchAlgorithmException, IOException {
+        StringBuilder md5Str = new StringBuilder();
+        // 生成MD5文件。
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        long length = 1024;
+        File file = new File(filePath);
+        if (file.length() < length) {
+            length = file.length();
+        }
+        byte[] buffer = new byte[(int) length];
+        is.read(buffer, 0, buffer.length);
+        // 第一步：“1K 文件内容” 生成MD5.
+        String firstMD5 = md.digest(buffer).toString();
+        // 第一步：“firstMD5 + 文件名 + 文件长度 + 文件修改时间” 生成MD5.
+        String fileInfo = getFileName() +
+                file.length() + "" + file.lastModified();
+        byte[] md3Byte = md.digest((firstMD5 + fileInfo).getBytes());
+        for (int i = 0; i < md3Byte.length; i++) {
+            int temp = md3Byte[i] & 0xFF;
+            String hexString = Integer.toHexString(temp);
+            if (hexString.length() < 2) {
+                md5Str.append("0").append(hexString);
+            } else {
+                md5Str.append(hexString);
+            }
+        }
+
+        return md5Str.toString();
+    }
+
+    protected boolean saveBitmap(String bitmapPath, MediaMetadataRetriever retriever) {
+        File bitmapFile = new File(bitmapPath);
+        if (bitmapFile.exists()) {
+            return true;
+        }
+        boolean saveSuccees = false;
+        if (!bitmapFile.exists()) {
+            Bitmap bitmap = null;
+            FileOutputStream out = null;
+            try {
+                if (getFileType() == MediaUtil.FileType.AUDIO) {
+                    bitmap = MediaUtil.BytesToBitmap(retriever.getEmbeddedPicture());
+                    if (bitmap != null) {
+                        bitmap = MediaUtil.BitmapScale(bitmap, 100, 100);
+                    }
+                } else if (getFileType() == MediaUtil.FileType.VIDEO) {
+                    String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    int duration = Integer.valueOf(durationStr);
+                    if (duration > 1000000) { // 单位是微秒
+                        bitmap = retriever.getFrameAtTime(1000000, MediaMetadataRetriever.OPTION_NEXT_SYNC);
+                    } else {
+                        bitmap = retriever.getFrameAtTime();
+                    }
+                    if (bitmap != null) {
+                        bitmap = MediaUtil.BitmapScale(bitmap, 380, 198);
+                    }
+                }
+                if (bitmap != null) {
+                    File cacheDir = new File(StorageConfig.getStoragePath(getPortId()) +
+                            "/.geelyCache");
+                    if (cacheDir != null && !cacheDir.exists()) {
+                        cacheDir.mkdirs();
+                        //设置文件属性为隐藏
+                        try {
+                            Runtime.getRuntime().exec(" attrib +H  "+cacheDir.getAbsolutePath());
+                        } catch (Exception e) {
+                        }
+                    }
+                    out = new FileOutputStream(bitmapFile);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.flush();
+                    saveSuccees = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (bitmap != null) {
+                    bitmap.recycle();
+                }
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return saveSuccees;
     }
 }

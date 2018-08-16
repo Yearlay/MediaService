@@ -53,4 +53,8 @@ public class ImageBean extends MediaBean {
     public void setThumbnailPath(String thumbnailPath) {
         this.thumbnailPath = thumbnailPath;
     }
+
+    public void parseID3() {
+
+    }
 }
