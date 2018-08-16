@@ -3,21 +3,20 @@ package com.amt.radio;
 import android.os.Handler;
 import android.os.Message;
 
+import static com.amt.aidl.MediaDef.*;
+
 import com.amt.aidl.MediaDef;
 import com.amt.aidl.RadioBean;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.service.MediaServiceBinder;
-import com.haoke.define.RadioDef;
+import com.haoke.define.RadioDef.RadioFunc;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RadioManager {
 
-    interface RadioCallBack {
-        void onRadioDataChange(int func, int data);
-    }
-
+    private static RadioManager mSelf;
     private RadioInterface mRadioInstance;
     private RadioCallBack mRadioCallBack;
     private MediaServiceBinder.ManagerCallBack mBinderCallBack;
@@ -29,16 +28,8 @@ public class RadioManager {
 
     private static final int FREQ_COUNT_MAX = 30;
 
-    private static RadioManager mSelf;
-    synchronized public static RadioManager getInstance() {
-        if (mSelf == null) {
-            mSelf = new RadioManager();
-        }
-        return mSelf;
-    }
-
-    public static void registerCallBack(MediaServiceBinder.ManagerCallBack callBack) {
-        getInstance().mBinderCallBack = callBack;
+    interface RadioCallBack {
+        void onRadioDataChange(int func, int data);
     }
 
     private RadioManager() {
@@ -46,14 +37,47 @@ public class RadioManager {
         mRadioCallBack = new RadioCallBack() {
             @Override
             public void onRadioDataChange(int func, int data) {
+                boolean callback = false;
                 switch (func) {
-                    case RadioDef.RadioFunc.ALL_CH:
+                    case RadioFunc.FREQ:
+                        callback = true;
+                        break;
+                    case RadioFunc.BAND:
+                        callback = true;
+                        break;
+                    case RadioFunc.AREA:
+                        callback = true;
+                        break;
+                    case RadioFunc.ALL_CH:
                         updateMCURadioDatas();
                         break;
-                    default:
+                    case RadioFunc.CUR_CH:
+                        break;
+                    case RadioFunc.ST:
+                        callback = true;
+                        break;
+                    case RadioFunc.LOC:
+                        break;
+                    case RadioFunc.LISTEN:
+                        break;
+                    case RadioFunc.STATE:
+                        callback = true;
+                        break;
+                    case RadioFunc.RDS:
+                        break;
+                    case RadioFunc.RDS_TA:
+                    case RadioFunc.RDS_AF:
+                        break;
+                    case RadioFunc.RDS_TP:
+                    case RadioFunc.RDS_EON:
+                        break;
+                    case RadioFunc.PARAM:
+                        break;
+                    case RadioFunc.ENABLE:
+                        callback = true;
                         break;
                 }
-                if (mBinderCallBack != null) {
+                if (callback && mBinderCallBack != null) {
                     mBinderCallBack.onRadioCallBack(func, data);
                 }
             }
@@ -67,6 +91,127 @@ public class RadioManager {
         reLoadAMRadioDatas(0);
     }
 
+    synchronized public static RadioManager getInstance() {
+        if (mSelf == null) {
+            mSelf = new RadioManager();
+        }
+        return mSelf;
+    }
+
+    public static void registerCallBack(MediaServiceBinder.ManagerCallBack callBack) {
+        getInstance().mBinderCallBack = callBack;
+    }
+
+    public static int funcInt(int funcID) {
+        int code = ERROR_CODE_UNKNOWN;
+        RadioManager manager = getInstance();
+        switch (funcID) {
+            case FUNC_RADIO_GET_CUR_FREQ:
+                code = manager.getCurFreq();
+                break;
+            case FUNC_RADIO_GET_ENABLE:
+                code = manager.getEnable();
+                break;
+            case FUNC_RADIO_GET_ST:
+                code = manager.getST();
+                break;
+            case FUNC_RADIO_GET_CUR_BAND:
+                code = manager.getCurBand();
+                break;
+            case FUNC_RADIO_GET_CUR_AREA:
+                code = manager.getCurArea();
+                break;
+            case FUNC_RADIO_SCAN_STORE:
+                code = manager.scanStore();
+                break;
+            case FUNC_RADIO_SET_SCAN:
+                code = manager.setScan();
+                break;
+            case FUNC_RADIO_STOP_SCAN:
+                code = manager.stopScan();
+                break;
+            case FUNC_RADIO_SET_PRE_STEP:
+                code = manager.setPreStep();
+                break;
+            case FUNC_RADIO_SET_NEXT_STEP:
+                code = manager.setNextStep();
+                break;
+            case FUNC_RADIO_SET_PRE_SEARCH:
+                code = manager.setPreSearch();
+                break;
+            case FUNC_RADIO_SET_NEXT_SEARCH:
+                code = manager.setNextSearch();
+                break;
+            case FUNC_RADIO_SET_PRE_CHANNEL:
+                code = manager.setPreChannel();
+                break;
+            case FUNC_RADIO_SET_NEXT_CHANNEL:
+                code = manager.setNextChannel();
+                break;
+            case FUNC_RADIO_CLEAR_COLLECT_AM_STATION:
+                code = manager.clearCollectAMStation();
+                break;
+            case FUNC_RADIO_CLEAR_COLLECT_FM_STATION:
+                code = manager.clearCollectFMStation();
+                break;
+        }
+        return code;
+    }
+
+    public static int funcIntEx(int funcID, int arg1, int arg2, int arg3) {
+        int code = ERROR_CODE_UNKNOWN;
+        RadioManager manager = getInstance();
+        switch (funcID) {
+            case FUNC_RADIO_SET_CUR_FREQ:
+                code = manager.setCurFreq(arg1);
+                break;
+            case FUNC_RADIO_SET_ENABLE:
+                code = manager.setEnable(arg1);
+                break;
+            case FUNC_RADIO_SET_CUR_BAND:
+                code = manager.setCurBand(arg1);
+                break;
+            case FUNC_RADIO_SET_CUR_AREA:
+                code = manager.setCurArea(arg1);
+                break;
+        }
+        return code;
+    }
+
+    public static int funcRadioIntR(int funcID, RadioBean radioBean) {
+        int code = MediaDef.ERROR_CODE_UNKNOWN;
+        RadioManager manager = getInstance();
+        switch (funcID) {
+            case FUNC_RADIO_GET_COLLECT_STATE:
+                code = manager.isCollect(radioBean);
+                break;
+        }
+        return code;
+    }
+
+    public static int funcRadioIntLR(int funcID, List<RadioBean> list) {
+        int code = MediaDef.ERROR_CODE_UNKNOWN;
+        RadioManager manager = getInstance();
+        switch (funcID) {
+            case FUNC_RADIO_GET_STORE_STATION:
+                code = manager.getMCURadioStoreStation(list);
+                break;
+            case FUNC_RADIO_GET_COLLECT_AM_STATION:
+                code = manager.getAMRadioCollectStation(list);
+                break;
+            case FUNC_RADIO_GET_COLLECT_FM_STATION:
+                code = manager.getFMRadioCollectStation(list);
+                break;
+            case FUNC_RADIO_ADD_COLLECT_STATION:
+                code = manager.collectRadio(list);
+                break;
+            case FUNC_RADIO_DEL_COLLECT_STATION:
+                code = manager.unCollectRadio(list);
+                break;
+        }
+        return code;
+    }
+
     /**
      * 获取当前收音机频率。
      */
@@ -77,22 +222,22 @@ public class RadioManager {
     /**
      * 设置当前收音机频率。
      */
-    private void setCurFreq(int freq) {
-        mRadioInstance.setCurFreq(freq);
+    private int setCurFreq(int freq) {
+        return mRadioInstance.setCurFreq(freq);
     }
 
     /**
      * 获取收音机的打开关闭状态。
      */
-    private boolean isEnable() {
-        return mRadioInstance.isEnable();
+    private int getEnable() {
+        return mRadioInstance.getEnable();
     }
 
     /**
      * 打开关闭收音机。
      */
-    private void setEnable(boolean enable) {
-        mRadioInstance.setEnable(enable);
+    private int setEnable(int enable) {
+        return mRadioInstance.setEnable(enable);
     }
 
     /**
@@ -105,22 +250,22 @@ public class RadioManager {
     /**
      * 设置收音机波段。
      */
-    private void setCurBand(int band) {
-        mRadioInstance.setCurBand(band);
+    private int setCurBand(int band) {
+        return mRadioInstance.setCurBand(band);
     }
 
     /**
      * 获取收音区域（3ZA未使用）。
      */
-    public int getCurArea() {
+    private int getCurArea() {
         return mRadioInstance.getCurArea();
     }
 
     /**
      * 设置收音区域。
      */
-    private void setCurArea(byte area) {
-        mRadioInstance.setCurArea(area);
+    private int setCurArea(int area) {
+        return mRadioInstance.setCurArea(area);
     }
 
     /**
@@ -133,84 +278,84 @@ public class RadioManager {
     /**
      * 扫描并预览, 播放5秒，再搜索下一个。
      */
-    private void setScan() {
-        mRadioInstance.setScan();
+    private int setScan() {
+        return mRadioInstance.setScan();
     }
 
     /**
      * 停止扫描。
      */
-    private void stopScan() {
-        mRadioInstance.stopScan();
+    private int stopScan() {
+        return mRadioInstance.stopScan();
     }
 
     /**
      * 收音左步进
      */
-    private void setPreStep() {
-        mRadioInstance.setPreStep();
+    private int setPreStep() {
+        return mRadioInstance.setPreStep();
     }
 
     /**
      * 收音右步进
      */
-    private void setNextStep() {
-        mRadioInstance.setNextStep();
+    private int setNextStep() {
+        return mRadioInstance.setNextStep();
     }
 
     /**
      * 收音左搜索
      */
-    private void setPreSearch() {
-        mRadioInstance.setPreSearch();
+    private int setPreSearch() {
+        return mRadioInstance.setPreSearch();
     }
 
     /**
      * 收音右搜索
      */
-    private void setNextSearch() {
-        mRadioInstance.setNextSearch();
+    private int setNextSearch() {
+        return mRadioInstance.setNextSearch();
     }
 
     /**
      * 获取当前台是否是立体声电台。
      */
-    private boolean getST() {
+    private int getST() {
         return mRadioInstance.getST();
     }
 
     /**
      * 初始化频率列表。
      */
-    private void scanListChannel() {
-        mRadioInstance.scanListChannel();
+    private int scanListChannel() {
+        return mRadioInstance.scanListChannel();
     }
 
     /**
      * 扫描电台。
      */
-    private void scanStore() {
-        mRadioInstance.scanStore();
+    private int scanStore() {
+        return mRadioInstance.scanStore();
     }
 
     /**
      * 上一电台，预存台中的电台
      */
-    private void setPreChannel() {
-        mRadioInstance.setPreChannel();
+    private int setPreChannel() {
+        return mRadioInstance.setPreChannel();
     }
 
     /**
      * 下一电台，预存台中的电台
      */
-    private void setNextChannel() {
-        mRadioInstance.setNextChannel();
+    private int setNextChannel() {
+        return mRadioInstance.setNextChannel();
     }
 
     /**
      * 获取所有的FM的频道，存放到mFMRadioDatas中。
      */
-    public void reLoadFMRadioDatas(int delayTime) {
+    private void reLoadFMRadioDatas(int delayTime) {
         mLoadHandler.removeMessages(BEGIN_LOAD_FM_DATA);
         Message message = mLoadHandler.obtainMessage(BEGIN_LOAD_FM_DATA);
         if (delayTime == 0) {
@@ -223,7 +368,7 @@ public class RadioManager {
     /**
      * 获取所有的AM的频道，存放到mAMRadioDatas中。
      */
-    public void reLoadAMRadioDatas(int delayTime) {
+    private void reLoadAMRadioDatas(int delayTime) {
         mLoadHandler.removeMessages(BEGIN_LOAD_AM_DATA);
         Message message = mLoadHandler.obtainMessage(BEGIN_LOAD_AM_DATA);
         if (delayTime == 0) {
@@ -255,7 +400,7 @@ public class RadioManager {
                     mFMRadioDatas.clear();
                     mFMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
                     if (mBinderCallBack != null) {
-                        mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.FM_TYPE);
+                        mBinderCallBack.onRadioCallBack(RadioDef.CALLBACK_COLLECT_FM_STATION, 0);
                     }
                     break;
                 case BEGIN_LOAD_AM_DATA:
@@ -271,7 +416,7 @@ public class RadioManager {
                     mAMRadioDatas.clear();
                     mAMRadioDatas.addAll((ArrayList<RadioBean>) msg.obj);
                     if (mBinderCallBack != null) {
-                        mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.AM_TYPE);
+                        mBinderCallBack.onRadioCallBack(RadioDef.CALLBACK_COLLECT_AM_STATION, 0);
                     }
                     break;
                 default:
@@ -281,35 +426,38 @@ public class RadioManager {
     };
 
     /**
-     * 获得所有的AM电台
+     * 获得所有的收藏的AM电台
      */
-    public ArrayList<RadioBean> getAMRadioDatas() {
-        return mAMRadioDatas;
+    private int getAMRadioCollectStation(List<RadioBean> list) {
+        list.addAll(mAMRadioDatas);
+        return MediaDef.SUCCESS;
     }
 
     /**
-     * 获得所有的FM电台
+     * 获得所有的收藏的FM电台
      */
-    public ArrayList<RadioBean> getFMRadioDatas() {
-        return mFMRadioDatas;
+    private int getFMRadioCollectStation(List<RadioBean> list) {
+        list.addAll(mFMRadioDatas);
+        return MediaDef.SUCCESS;
     }
 
     /**
-     * 获得所有的FM电台
+     * 获得所有的搜索到的FM电台
      */
-    public ArrayList<RadioBean> getMCURadioDatas() {
-        return mMCURadioDatas;
+    private int getMCURadioStoreStation(List<RadioBean> list) {
+        list.addAll(mMCURadioDatas);
+        return MediaDef.SUCCESS;
     }
 
     /**
      * 收藏指定的电台（支持批量收藏）
      */
-    public void collectRadio(List<RadioBean> radioBeanList) {
+    private int collectRadio(List<RadioBean> radioBeanList) {
         boolean updateAMFlag = false;
         boolean updateFMFlag = false;
         for (RadioBean radioBean : radioBeanList) {
-            updateAMFlag = updateAMFlag || (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE);
-            updateFMFlag = updateFMFlag || (radioBean.getRadioType() == RadioBean.RadioType.FM_TYPE);
+            updateAMFlag = updateAMFlag || radioBean.isAmFreq();
+            updateFMFlag = updateFMFlag || radioBean.isFmFreq();
             mRadioDatabaseHelper.insert(radioBean);
         }
         if (updateAMFlag) {
@@ -318,17 +466,18 @@ public class RadioManager {
         if (updateFMFlag) {
             reLoadFMRadioDatas(0);
         }
+        return MediaDef.SUCCESS;
     }
 
     /**
      * 取消收藏指定的电台（支持批量取消）
      */
-    public void unCollectRadio(List<RadioBean> radioBeanList) {
+    private int unCollectRadio(List<RadioBean> radioBeanList) {
         boolean updateAMFlag = false;
         boolean updateFMFlag = false;
         for (RadioBean radioBean : radioBeanList) {
-            updateAMFlag = updateAMFlag || (radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE);
-            updateFMFlag = updateFMFlag || (radioBean.getRadioType() == RadioBean.RadioType.FM_TYPE);
+            updateAMFlag = updateAMFlag || radioBean.isAmFreq();
+            updateFMFlag = updateFMFlag || radioBean.isFmFreq();
             mRadioDatabaseHelper.delete(radioBean);
         }
         if (updateAMFlag) {
@@ -337,54 +486,56 @@ public class RadioManager {
         if (updateFMFlag) {
             reLoadFMRadioDatas(0);
         }
+        return MediaDef.SUCCESS;
     }
 
     /**
      * 判断指定的电台是否是收藏电台
-     * @param radioBean
-     * @return
      */
-    public boolean isCollect(RadioBean radioBean) {
+    private int isCollect(RadioBean radioBean) {
         boolean retFlag = false;
-        ArrayList<RadioBean> radioBeans = radioBean.getRadioType() == RadioBean.RadioType.AM_TYPE ?
-                mAMRadioDatas : mFMRadioDatas;
+        ArrayList<RadioBean> radioBeans = radioBean.isFmFreq() ?
+                mFMRadioDatas : mAMRadioDatas;
         for (RadioBean bean : radioBeans) {
             if (bean.getFreq() == radioBean.getFreq()) {
                 retFlag = true;
                 break;
             }
         }
-        return retFlag;
+        return retFlag ? MediaDef.TRUE : MediaDef.FALSE;
     }
 
     /**
      * 清空AM电台。
      */
-    public void clearAMRadios() {
+    private int clearCollectAMStation() {
         mRadioDatabaseHelper.clearAM();
         mAMRadioDatas.clear();
         reLoadAMRadioDatas(0);
+        return MediaDef.SUCCESS;
     }
 
     /**
      * 清空FM电台。
      */
-    public void clearFMRadios() {
+    private int clearCollectFMStation() {
         mRadioDatabaseHelper.clearFM();
         mFMRadioDatas.clear();
         reLoadFMRadioDatas(0);
+        return MediaDef.SUCCESS;
     }
 
     private void updateMCURadioDatas() {
         mMCURadioDatas.clear();
+        boolean isFmFreq = ((getCurBand() == RadioDef.BAND_FM) ? true : false);
         for (int index = 0; index < FREQ_COUNT_MAX; index++) {
             int freq = getChannel(index);
             RadioBean radioBean = new RadioBean(null, String.valueOf(freq),
-                    null, RadioBean.RadioType.MCU_TYPE);
+                    null, isFmFreq);
             mMCURadioDatas.add(radioBean);
         }
         if (mBinderCallBack != null) {
-            mBinderCallBack.onRadioCallBack(MediaDef.CALLBACK_RADIO_DB_LOAD, RadioBean.RadioType.MCU_TYPE);
+            mBinderCallBack.onRadioCallBack(MediaDef.RadioDef.CALLBACK_STORE_STATION, 0);
         }
     }
 }

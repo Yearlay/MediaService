@@ -1,6 +1,6 @@
 package com.amt.radio;
 
-public interface RadioInterface {
+interface RadioInterface {
 
     /**
      * 设置回调
@@ -10,100 +10,100 @@ public interface RadioInterface {
     /**
      * 获取当前收音机频率。
      */
-    public int getCurFreq();
+    int getCurFreq();
 
     /**
      * 设置当前收音机频率。
      */
-    public void setCurFreq(int freq);
+    int setCurFreq(int freq);
 
     /**
      * 获取收音机的打开关闭状态。
      */
-    public boolean isEnable();
+    int getEnable();
 
     /**
      * 打开关闭收音机。
      */
-    public void setEnable(boolean enable);
+    int setEnable(int enable);
 
     /**
      * 获取收音机波段。
      */
-    public int getCurBand();
+    int getCurBand();
 
     /**
      * 设置收音机波段。
      */
-    public void setCurBand(int band);
+    int setCurBand(int band);
 
     /**
      * 获取收音区域（3ZA未使用）。
      */
-    public int getCurArea();
+    int getCurArea();
 
     /**
      * 设置收音区域。
      */
-    public void setCurArea(byte area);
+    int setCurArea(int area);
 
     /**
      * 获取第index个预存台，索引从1开始，传0获取的是列表的波段类型。index <= 30。
      */
-    public int getChannel(int index);
+    int getChannel(int index);
 
     /**
      * 扫描并预览, 播放5秒，再搜索下一个。
      */
-    public void setScan();
+    int setScan();
 
     /**
      * 停止扫描。
      */
-    public void stopScan();
+    int stopScan();
 
     /**
      * 收音左步进
      */
-    public void setPreStep();
+    int setPreStep();
 
     /**
      * 收音右步进
      */
-    public void setNextStep();
+    int setNextStep();
 
     /**
      * 收音左搜索
      */
-    public void setPreSearch();
+    int setPreSearch();
 
     /**
      * 收音右搜索
      */
-    public void setNextSearch();
+    int setNextSearch();
 
     /**
      * 获取当前台是否是立体声电台。
      */
-    public boolean getST();
+    int getST();
 
     /**
      * 初始化频率列表。
      */
-    public void scanListChannel();
+    int scanListChannel();
 
     /**
      * 扫描电台。
      */
-    public void scanStore();
+    int scanStore();
 
     /**
      * 上一电台，预存台中的电台
      */
-    public void setPreChannel();
+    int setPreChannel();
 
     /**
      * 下一电台，预存台中的电台
      */
-    public void setNextChannel();
+    int setNextChannel();
 }

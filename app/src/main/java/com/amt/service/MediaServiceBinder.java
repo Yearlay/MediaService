@@ -32,6 +32,7 @@ public class MediaServiceBinder extends IMediaService.Stub {
 
     private void registerCallBackToManager() {
         BtMusicManager.registerCallBack(mManagerCallBack);
+        RadioManager.registerCallBack(mManagerCallBack);
     }
 
     @Override
@@ -123,6 +124,7 @@ public class MediaServiceBinder extends IMediaService.Stub {
             case FUNC_AUDIO:
                 break;
             case FUNC_RADIO:
+                code = RadioManager.funcInt(funcID);
                 break;
             case FUNC_BTMUSIC:
                 code = BtMusicManager.funcInt(funcID);
@@ -133,7 +135,24 @@ public class MediaServiceBinder extends IMediaService.Stub {
 
     @Override
     public int funcIntEx(int funcID, int arg1, int arg2, int arg3) throws RemoteException {
-        return 0;
+        int code = ERROR_CODE_UNKNOWN;
+        int index = MediaDefUtil.getFuncRange(funcID);
+        switch (index) {
+            case FUNC_ERROR:
+                break;
+            case FUNC_IMAGE:
+                break;
+            case FUNC_VIDEO:
+                break;
+            case FUNC_AUDIO:
+                break;
+            case FUNC_RADIO:
+                code = RadioManager.funcIntEx(funcID, arg1, arg2, arg3);
+                break;
+            case FUNC_BTMUSIC:
+                break;
+        }
+        return code;
     }
 
     @Override
@@ -179,23 +198,13 @@ public class MediaServiceBinder extends IMediaService.Stub {
     }
 
     @Override
-    public List<RadioBean> getRadioDatas(int radioType) throws RemoteException {
-        RadioManager radioManager = RadioManager.getInstance();
-        List<RadioBean> radioBeanList = null;
-        switch (radioType) {
-            case RadioBean.RadioType.AM_TYPE:
-                radioBeanList = radioManager.getAMRadioDatas();
-                break;
-            case RadioBean.RadioType.FM_TYPE:
-                radioBeanList = radioManager.getFMRadioDatas();
-                break;
-            case RadioBean.RadioType.MCU_TYPE:
-                radioBeanList = radioManager.getMCURadioDatas();
-                break;
-            default:
-                break;
-        }
-        return radioBeanList;
+    public int funcRadioIntR(int funcID, RadioBean radioBean) throws RemoteException {
+        return RadioManager.funcRadioIntR(funcID, radioBean);
+    }
+
+    @Override
+    public int funcRadioIntLR(int funcID, List<RadioBean> list) throws RemoteException {
+        return RadioManager.funcRadioIntLR(funcID, list);
     }
 
     static class MediaClient {
