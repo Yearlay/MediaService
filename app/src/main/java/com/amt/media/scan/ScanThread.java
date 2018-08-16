@@ -74,11 +74,6 @@ public class ScanThread extends Thread {
         DebugLog.i(TAG, "scanStorage Path: " + storagePath);
         AllMediaList allMediaList = AllMediaList.instance(mediaDbHelper.getContext());
         int portId = StorageConfig.getPortId(storagePath);
-        StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
-        if (storageBean.getState() >= StorageBean.MOUNTED) {
-            // 更新扫描状态为"文件正在扫描中"。
-            StorageManager.instance().updateStorageState(portId, StorageBean.FILE_SCANNING);
-        }
         int mediaCount = 0;
         int scanState = StorageBean.FILE_SCANNING;
         try {
@@ -101,13 +96,17 @@ public class ScanThread extends Thread {
             } else {
                 DebugLog.d(TAG, " Scan check successful!!!");
             }
-            scanState = StorageBean.FILE_SCAN_OVER;
+            if (mediaCount == -1) {
+                scanState = StorageBean.SCAN_ERROR;
+            } else {
+                scanState = StorageBean.FILE_SCAN_OVER;
+            }
         } catch (Exception e) {
             scanState = StorageBean.SCAN_ERROR;
             e.printStackTrace();
         }
         // FILE_SCAN_OVER 或者是 SCAN_ERROR。
-        StorageManager.instance().updateStorageState(portId, scanState);
+        ScanManager.instance().endScanStorage(portId, scanState);
     }
 
     private int jniScanRootPath(String filePath, int onlyGetMediaSizeFlag) {
