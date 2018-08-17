@@ -1,43 +1,41 @@
 package com.amt.media.datacache;
 
+import android.provider.MediaStore;
+
+import com.amt.media.bean.MediaBean;
+import com.amt.media.database.MediaDbHelper;
+import com.amt.media.util.DBConfig;
+import com.amt.media.util.MediaUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class LoadThread extends Thread {
 
-    class LoadData {
-        boolean collectFlag;
-        int portId;
-        int fileType;
+    List<String> mLoadMsgList = Collections.synchronizedList(new ArrayList<String>());
 
-        public LoadData(boolean collectFlag, int portId, int fileType) {
-            this.collectFlag = collectFlag;
-            this.portId = portId;
-            this.fileType = fileType;
-        }
-    }
-
-    List<LoadData> mLoadMsgList = Collections.synchronizedList(new ArrayList<LoadData>());
-
-    public void addToListAndStart(LoadData data) {
+    public void addToListAndStart(String tableName) {
         for (int index = 0; index < mLoadMsgList.size(); index++) {
-            LoadData loadData = mLoadMsgList.get(index);
-            if (loadData.collectFlag == data.collectFlag &&
-                    loadData.portId == data.portId &&
-                    loadData.fileType == data.fileType) {
+            if (tableName.equals(mLoadMsgList.get(index))) {
                 return;
             }
         }
-        mLoadMsgList.add(data);
+        mLoadMsgList.add(tableName);
     }
 
     @Override
     public void run() {
         synchronized (AllMediaList.mLoadLock) {
             while (mLoadMsgList.size() > 0) {
-                LoadData data = mLoadMsgList.remove(0);
-                // TODO
+                String tableName = mLoadMsgList.remove(0);
+                AllMediaList allMediaList = AllMediaList.instance();
+                MediaDbHelper mediaDbHelper = MediaDbHelper.instance();
+                ArrayList<MediaBean> mediaBeans = allMediaList.mAllMediaHash.get(tableName);
+                // mediaBeans不可能为空。不用加判空逻辑。
+                mediaBeans.clear();
+                mediaBeans.addAll(mediaDbHelper.query(tableName, null, null, false));
+                allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName);
             }
         }
     }

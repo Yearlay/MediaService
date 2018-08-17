@@ -268,8 +268,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      * @param tableName
      */
     public void notifyChange(String tableName) {
-        // TODO 通知内容观察者tableName表数据有变化。
-        // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
+        AllMediaList.instance().notifyChange(tableName);
     }
 
     /**
