@@ -1,5 +1,6 @@
 package com.amt.media.datacache;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Message;
 
@@ -28,6 +29,7 @@ public class AllMediaList {
     protected HashMap<String, ArrayList<MediaBean>> mAllMediaHash = new HashMap<String, ArrayList<MediaBean>>();
     protected LoadHandler mLoadHandler;
     protected ArrayList<LoadListener> mLoadListeners = new ArrayList<LoadListener>();
+    protected OperateHandler mOperateHandler;
 
     private Context mContext;
     private MediaDbHelper mMediaDbHelper;
@@ -50,6 +52,7 @@ public class AllMediaList {
         mContext = context;
         mMediaDbHelper = new MediaDbHelper(mContext);
         mLoadHandler = new LoadHandler();
+        mOperateHandler = new OperateHandler();
     }
 
     /**
@@ -169,5 +172,63 @@ public class AllMediaList {
         mLoadHandler.removeMessages(LoadHandler.BEGIN_LOAD_ITEM, tableName);
         Message message = mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName);
         mLoadHandler.sendMessageDelayed(message, 500);
+    }
+
+    /**
+     * 删除操作，针对集合对象。
+     */
+    public void deleteMediaFiles(ArrayList<MediaBean> beans, OperateListener listener) {
+        int operateValue = OperateHandler.MSG_DELETE;
+        Message message = mOperateHandler.obtainMessage(operateValue,
+                new OperateThread.OperateData(operateValue, beans, listener));
+        mOperateHandler.sendMessage(message);
+    }
+
+    /**
+     * 收藏操作，MediaBean。
+     */
+    public void collectMediaFile(MediaBean mediaBean, OperateListener listener) {
+        ArrayList<MediaBean> dataList = new ArrayList<MediaBean>();
+        dataList.add(mediaBean);
+        collectMediaFiles(dataList, listener);
+    }
+
+    /**
+     * 收藏操作，针对集合对象。
+     */
+    public void collectMediaFiles(ArrayList<MediaBean> beans, OperateListener listener) {
+        int operateValue = OperateHandler.MSG_COLLECT;
+        Message message = mOperateHandler.obtainMessage(operateValue,
+                new OperateThread.OperateData(operateValue, beans, listener));
+        mOperateHandler.sendMessage(message);
+    }
+
+    /**
+     * 取消收藏操作，针对FileNode对象。
+     */
+    public void uncollectMediaFile(MediaBean mediaBean, OperateListener listener) {
+        ArrayList<MediaBean> dataList = new ArrayList<MediaBean>();
+        dataList.add(mediaBean);
+        uncollectMediaFiles(dataList, listener);
+    }
+
+    /**
+     * 取消收藏操作，针对集合对象。
+     */
+    public void uncollectMediaFiles(ArrayList<MediaBean> beans, OperateListener listener) {
+        int operateValue = OperateHandler.MSG_UNCOLLECT;
+        Message message = mOperateHandler.obtainMessage(operateValue,
+                new OperateThread.OperateData(operateValue, beans, listener));
+        mOperateHandler.sendMessage(message);
+    }
+
+    /**
+     * 拷贝操作，针对集合对象。
+     */
+    public void copyToLocal(ArrayList<MediaBean> beans, OperateListener listener) {
+        int operateValue = OperateHandler.MSG_COPY_TO_LOCAL;
+        Message message = mOperateHandler.obtainMessage(operateValue,
+                new OperateThread.OperateData(operateValue, beans, listener));
+        mOperateHandler.sendMessage(message);
     }
 }

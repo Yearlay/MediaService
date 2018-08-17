@@ -24,6 +24,10 @@ public class ImageBean extends MediaBean {
         return contentValues;
     }
 
+    public ImageBean() {
+        super();
+    }
+
     public ImageBean(Cursor cursor) {
         super(cursor);
         width = cursor.getInt(cursor.getColumnIndex(FIELD_IMAGE_WIDTH));

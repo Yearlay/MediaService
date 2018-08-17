@@ -32,6 +32,10 @@ public class VideoBean extends MediaBean {
         return contentValues;
     }
 
+    public VideoBean() {
+        super();
+    }
+
     public VideoBean(Cursor cursor) {
         super(cursor);
         duration = cursor.getInt(cursor.getColumnIndex(FIELD_DURATION));

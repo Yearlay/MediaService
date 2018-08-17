@@ -3,6 +3,8 @@ package com.amt.media.bean;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.amt.media.util.MediaUtil;
+
 /**
  * Created by archermind on 2018/8/9.
  */
@@ -28,5 +30,24 @@ public class CollectImageBean extends ImageBean {
     public CollectImageBean(Cursor cursor) {
         super(cursor);
         username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));
+    }
+
+    public CollectImageBean(ImageBean imageBean) {
+        setPortId(imageBean.getPortId());
+        setFileType(imageBean.getFileType());
+        setFilePath(imageBean.getFilePath());
+        setFileName(imageBean.getFileName());
+        setFileNamePY(imageBean.getFileNamePY());
+        setFileSize(imageBean.getFileSize());
+        setLastDate(imageBean.getLastDate());
+        setOnlyreadFlag(imageBean.getOnlyreadFlag());
+        setId3Flag(imageBean.getId3Flag());
+        setUnsupportFlag(imageBean.getUnsupportFlag());
+        setCollectFlag(imageBean.getCollectFlag());
+
+        setWidth(imageBean.getWidth());
+        setHeight(imageBean.getHeight());
+        setThumbnailPath(imageBean.getThumbnailPath());
+        setUsername(MediaUtil.getUserName());
     }
 }
