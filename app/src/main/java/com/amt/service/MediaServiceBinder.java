@@ -198,11 +198,6 @@ public class MediaServiceBinder extends IMediaService.Stub {
     }
 
     @Override
-    public int funcRadioIntR(int funcID, RadioBean radioBean) throws RemoteException {
-        return RadioManager.funcRadioIntR(funcID, radioBean);
-    }
-
-    @Override
     public int funcRadioIntLR(int funcID, List<RadioBean> list) throws RemoteException {
         return RadioManager.funcRadioIntLR(funcID, list);
     }

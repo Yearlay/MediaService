@@ -6,14 +6,20 @@ import com.amt.aidl.MediaDef;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 import com.haoke.aidl.ICarCallBack;
+import com.haoke.define.RadioDef;
 import com.haoke.define.RadioDef.Band_5;
 import com.haoke.define.RadioDef.Area;
 import com.haoke.serviceif.CarService_IF;
 
+import static com.amt.aidl.MediaDef.FALSE;
+import static com.amt.aidl.MediaDef.TRUE;
+
 public class Radio_Haoke extends CarService_IF implements RadioInterface {
     private static final String TAG = "Radio_Haoke";
     private RadioManager.RadioCallBack mCallBack;
-
+    private boolean isScan5S = false;
+    private boolean isRescan = false;
+    private boolean isScanAutoNext = false;
 
     private static Radio_Haoke mSelf;
     synchronized public static RadioInterface getInstance() {
@@ -30,11 +36,19 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
         mICallBack = new ICarCallBack.Stub() {
             @Override
             public void onDataChange(int mode, int func, int data) throws RemoteException {
-                if (mCallBack != null) {
-                    mCallBack.onRadioDataChange(func, data);
+                if (mode == com.haoke.define.ModeDef.RADIO) {
+                    switch (func) {
+                    case RadioDef.RadioFunc.STATE:
+                        isScanStateChange(data);
+                        break;
+                    }
+                    if (mCallBack != null) {
+                        mCallBack.onRadioDataChange(func, data);
+                    }
                 }
             }
         };
+        scanListChannel();
     }
 
     /**
@@ -43,6 +57,24 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
     @Override
     public void setCallBack(RadioManager.RadioCallBack callBack) {
         mCallBack = callBack;
+        bindCarService();
+    }
+
+    private void isScanStateChange(int data) {
+        //data为2表示SCAN[Scan5S]， 为3表示SEARCH[Rescan]
+        if (data == 0) {
+            isScan5S = false;
+            isRescan = false;
+        } else if (data == 2) {
+            isScan5S = true;
+            isRescan = false;
+        } else if (data == 3) {
+            isRescan = true;
+            isScan5S = false;
+        } else if (data == 4) {
+            isRescan = false;
+            isScan5S = false;
+        }
     }
 
     /**
@@ -91,7 +123,7 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
             DebugLog.e(TAG, "getEnable e=" + e.getMessage());
         }
         DebugLog.d(TAG, "getEnable enable="+enable);
-        return enable ? MediaDef.TRUE : MediaDef.FALSE;
+        return enable ? TRUE : FALSE;
     }
 
     /**
@@ -105,7 +137,7 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
         try {
             boolean focus = true;
             DebugLog.d(TAG, "setEnable enable="+enable);
-            if (enable == MediaDef.TRUE) {
+            if (enable == TRUE) {
                 //if (MediaInterfaceUtil.mediaCannotPlay()) {
                 //    return;
                 //}
@@ -234,8 +266,8 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
             //boolean focus = getRadioManager().requestAudioFocus(true);
             //DebugLog.d(TAG, "setScan focus="+focus);
             //if (focus) {
-            //    isRescan = false;
-            //    isScan5S = true;
+                isRescan = false;
+                isScan5S = true;
             //    setRadioSource();
                 mServiceIF.radio_scan();
             //}
@@ -246,18 +278,63 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
         return code;
     }
 
-    /**
-     * 停止扫描。
-     */
-    @Override
-    public int stopScan() {
+    private int stopScanInternal() {
         int code = MediaDef.ERROR_CODE_UNKNOWN;
         try {
-            DebugLog.d(TAG, "stopScan");
             mServiceIF.radio_stopScanStore();
             code = MediaDef.SUCCESS;
         } catch (Exception e) {
-            DebugLog.e(TAG, "stopScan e=" + e.getMessage());
+            DebugLog.e(TAG, "stopScanInternal e=" + e.getMessage());
+        }
+        return code;
+    }
+
+    /**
+     * 停止扫描预览。
+     */
+    @Override
+    public int stopScan() {
+        int code = isScan5S ? TRUE : FALSE;
+        boolean state = isScan5S;
+        if (isScan5S) {
+            isScan5S = false;
+            stopScan();
+        }
+        return code;
+    }
+
+    /**
+     * 扫描电台。
+     */
+    @Override
+    public int scanStore() {
+        int code = MediaDef.ERROR_CODE_UNKNOWN;
+        try {
+            //boolean focus = getRadioManager().requestAudioFocus(true);
+            //DebugLog.d(TAG, "scanStore focus="+focus);
+            //if (focus) {
+                isRescan = true;
+                isScan5S = false;
+            //    setRadioSource();
+            //    setRecordRadioOnOff(false);
+            mServiceIF.radio_scanStore();
+            //}
+            code = MediaDef.SUCCESS;
+        } catch (Exception e) {
+            DebugLog.e(TAG, "scanStore e=" + e.getMessage());
+        }
+        return code;
+    }
+
+    /**
+     * 停止扫描电台。
+     */
+    @Override
+    public int stopScanStore() {
+        int code = isRescan ? TRUE : FALSE;
+        if (isRescan) {
+            isRescan = false;
+            stopScan();
         }
         return code;
     }
@@ -349,9 +426,9 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
      */
     @Override
     public int getST() {
-        int code = MediaDef.FALSE;
+        int code = FALSE;
         try {
-            code = mServiceIF.radio_getST() == 1 ? MediaDef.TRUE : MediaDef.FALSE;
+            code = mServiceIF.radio_getST() == 1 ? TRUE : FALSE;
         } catch (Exception e) {
             DebugLog.e(TAG, "getST e=" + e.getMessage());
         }
@@ -371,29 +448,6 @@ public class Radio_Haoke extends CarService_IF implements RadioInterface {
             code = MediaDef.SUCCESS;
         } catch (Exception e) {
             DebugLog.e(TAG, "scanListChannel e=" + e.getMessage());
-        }
-        return code;
-    }
-
-    /**
-     * 扫描电台。
-     */
-    @Override
-    public int scanStore() {
-        int code = MediaDef.ERROR_CODE_UNKNOWN;
-        try {
-            //boolean focus = getRadioManager().requestAudioFocus(true);
-            //DebugLog.d(TAG, "scanStore focus="+focus);
-            //if (focus) {
-            //    isRescan = true;
-            //    isScan5S = false;
-            //    setRadioSource();
-            //    setRecordRadioOnOff(false);
-                mServiceIF.radio_scanStore();
-            //}
-            code = MediaDef.SUCCESS;
-        } catch (Exception e) {
-            DebugLog.e(TAG, "scanStore e=" + e.getMessage());
         }
         return code;
     }

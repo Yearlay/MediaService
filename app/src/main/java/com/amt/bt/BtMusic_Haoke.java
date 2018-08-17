@@ -49,7 +49,6 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
                 }
             }
         };
-        bindBTService();
     }
 
     synchronized public static BtMusicInterface getInstance() {
@@ -70,6 +69,7 @@ class BtMusic_Haoke extends BTService_IF implements BtMusicInterface{
     @Override
     public void setCallBack(BtMusicManager.BtMusicCallBack callBack) {
         mCallBack = callBack;
+        bindBTService();
     }
 
     /**

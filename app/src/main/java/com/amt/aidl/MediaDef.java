@@ -52,9 +52,10 @@ public class MediaDef {
     public static final int FUNC_RADIO_SET_CUR_BAND = 212;
     public static final int FUNC_RADIO_GET_CUR_AREA = 213;
     public static final int FUNC_RADIO_SET_CUR_AREA = 214;
-    public static final int FUNC_RADIO_SCAN_STORE = 221;
-    public static final int FUNC_RADIO_SET_SCAN = 222;
-    public static final int FUNC_RADIO_STOP_SCAN = 223;
+    public static final int FUNC_RADIO_SET_SCAN = 221;
+    public static final int FUNC_RADIO_STOP_SCAN = 222;
+    public static final int FUNC_RADIO_SCAN_STORE = 223;
+    public static final int FUNC_RADIO_STOP_SCAN_STORE = 224;
     public static final int FUNC_RADIO_SET_PRE_STEP = 231;
     public static final int FUNC_RADIO_SET_NEXT_STEP = 232;
     public static final int FUNC_RADIO_SET_PRE_SEARCH = 233;

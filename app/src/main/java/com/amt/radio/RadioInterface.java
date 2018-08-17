@@ -58,9 +58,19 @@ interface RadioInterface {
     int setScan();
 
     /**
-     * 停止扫描。
+     * 停止扫描预览。
      */
     int stopScan();
+
+    /**
+     * 扫描电台。
+     */
+    int scanStore();
+
+    /**
+     * 停止扫描电台。
+     */
+    int stopScanStore();
 
     /**
      * 收音左步进
@@ -91,11 +101,6 @@ interface RadioInterface {
      * 初始化频率列表。
      */
     int scanListChannel();
-
-    /**
-     * 扫描电台。
-     */
-    int scanStore();
 
     /**
      * 上一电台，预存台中的电台

@@ -121,14 +121,17 @@ public class RadioManager {
             case FUNC_RADIO_GET_CUR_AREA:
                 code = manager.getCurArea();
                 break;
-            case FUNC_RADIO_SCAN_STORE:
-                code = manager.scanStore();
-                break;
             case FUNC_RADIO_SET_SCAN:
                 code = manager.setScan();
                 break;
             case FUNC_RADIO_STOP_SCAN:
                 code = manager.stopScan();
+                break;
+            case FUNC_RADIO_SCAN_STORE:
+                code = manager.scanStore();
+                break;
+            case FUNC_RADIO_STOP_SCAN_STORE:
+                code = manager.stopScanStore();
                 break;
             case FUNC_RADIO_SET_PRE_STEP:
                 code = manager.setPreStep();
@@ -168,22 +171,14 @@ public class RadioManager {
             case FUNC_RADIO_SET_ENABLE:
                 code = manager.setEnable(arg1);
                 break;
+            case FUNC_RADIO_GET_COLLECT_STATE:
+                code = manager.isCollect(arg1, arg2);
+                break;
             case FUNC_RADIO_SET_CUR_BAND:
                 code = manager.setCurBand(arg1);
                 break;
             case FUNC_RADIO_SET_CUR_AREA:
                 code = manager.setCurArea(arg1);
-                break;
-        }
-        return code;
-    }
-
-    public static int funcRadioIntR(int funcID, RadioBean radioBean) {
-        int code = MediaDef.ERROR_CODE_UNKNOWN;
-        RadioManager manager = getInstance();
-        switch (funcID) {
-            case FUNC_RADIO_GET_COLLECT_STATE:
-                code = manager.isCollect(radioBean);
                 break;
         }
         return code;
@@ -283,10 +278,24 @@ public class RadioManager {
     }
 
     /**
-     * 停止扫描。
+     * 停止扫描预览。
      */
     private int stopScan() {
         return mRadioInstance.stopScan();
+    }
+
+    /**
+     * 扫描电台。
+     */
+    private int scanStore() {
+        return mRadioInstance.scanStore();
+    }
+
+    /**
+     * 扫描电台。
+     */
+    private int stopScanStore() {
+        return mRadioInstance.stopScanStore();
     }
 
     /**
@@ -329,13 +338,6 @@ public class RadioManager {
      */
     private int scanListChannel() {
         return mRadioInstance.scanListChannel();
-    }
-
-    /**
-     * 扫描电台。
-     */
-    private int scanStore() {
-        return mRadioInstance.scanStore();
     }
 
     /**
@@ -492,12 +494,17 @@ public class RadioManager {
     /**
      * 判断指定的电台是否是收藏电台
      */
-    private int isCollect(RadioBean radioBean) {
+    private int isCollect(int freq, int band) {
         boolean retFlag = false;
-        ArrayList<RadioBean> radioBeans = radioBean.isFmFreq() ?
+        if (band == 0) {
+            band = getCurBand();
+        }
+        float temp = freq / 100.00f;
+        String sfreq = String.valueOf(temp);
+        ArrayList<RadioBean> radioBeans = band != RadioDef.BAND_AM ?
                 mFMRadioDatas : mAMRadioDatas;
         for (RadioBean bean : radioBeans) {
-            if (bean.getFreq() == radioBean.getFreq()) {
+            if (bean.getFreq().equals(sfreq)) {
                 retFlag = true;
                 break;
             }
