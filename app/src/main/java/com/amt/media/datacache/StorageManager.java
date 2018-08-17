@@ -38,6 +38,14 @@ public class StorageManager {
         return sStorageMap.get(new Integer(portId));
     }
 
+    public ArrayList<StorageBean> getDefaultStorageBeans() {
+        ArrayList<StorageBean> storageBeans = new ArrayList<StorageBean>();
+        storageBeans.add(getStorageBean(StorageConfig.PortId.SDCARD_PORT));
+        storageBeans.add(getStorageBean(StorageConfig.PortId.USB1_PORT));
+        storageBeans.add(getStorageBean(StorageConfig.PortId.USB2_PORT));
+        return storageBeans;
+    }
+
     /**
      * 注册磁盘状态的监听
      * @param storageListener
@@ -55,7 +63,7 @@ public class StorageManager {
     }
 
     /**
-     * 更新磁盘扫描的状态。
+     * 更新磁盘扫描的状态。该方法只能在主线程中调用。
      * @param portId
      * @param state
      */
@@ -66,11 +74,13 @@ public class StorageManager {
         }
         storageBean.setState(state);
 
-        mHandler.obtainMessage(UPDATE_STATE, storageBean).sendToTarget();
+        for (StorageListener storageListener : mStorageListenerList) {
+            storageListener.onScanStateChange(storageBean);
+        }
     }
 
     /**
-     * 更新磁盘媒体的数量。
+     * 更新磁盘媒体的数量。该方法只能在主线程中调用。
      * @param portId
      * @param audioCount
      * @param videoCount
@@ -87,32 +97,8 @@ public class StorageManager {
         storageBean.setVideoCount(videoCount);
         storageBean.setImageCount(imageCount);
 
-        mHandler.obtainMessage(UPDATE_MEDIA_COUNT, storageBean).sendToTarget();
-    }
-
-    private static final int UPDATE_STATE = 1;
-    private static final int UPDATE_MEDIA_COUNT = 2;
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            StorageBean storageBean = (StorageBean) msg.obj;
-            switch (msg.what) {
-                case UPDATE_STATE:
-                    for (StorageListener storageListener : mStorageListenerList) {
-                        storageListener.onScanStateChange(storageBean);
-                    }
-                    break;
-
-                case UPDATE_MEDIA_COUNT:
-                    for (StorageListener storageListener : mStorageListenerList) {
-                        storageListener.onMediaCountChange(storageBean);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
+        for (StorageListener storageListener : mStorageListenerList) {
+            storageListener.onMediaCountChange(storageBean);
         }
-    };
+    }
 }

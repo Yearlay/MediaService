@@ -14,6 +14,7 @@ import java.util.HashSet;
 import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.UserBean;
 import com.amt.media.bean.UserInfoBean;
+import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 import com.amt.util.GsonUtil;
 
@@ -129,24 +130,11 @@ public class MediaUtil {
      * 媒体设备分类
      */
     public class DeviceType {
-        /** 无外部设备插入 value:0 */
         public static final byte NULL = 0;
-        /** SD卡插槽1设备 value:1 */
-        public static final byte SD1 = 1;
-        /** SD卡插槽2设备 value:2 */
-        public static final byte SD2 = 2;
-        /** USB 插槽1设备 value:3 */
-        public static final byte USB1 = 3;
-        /** USB 插槽2设备 value:4 */
-        public static final byte USB2 = 4;
-        /** USB 插槽3设备 value:5 */
-        public static final byte USB3 = 5;
-        /** USB 插槽4设备 value:6 */
-        public static final byte USB4 = 6;
-        /** 本地存储设备 value:13 */
-        public static final byte FLASH = 13;
-        /** 收藏设备 value:19 */
-        public static final byte COLLECT = 19;
+        public static final byte SDCARD = 1;
+        public static final byte USB1 = 2;
+        public static final byte USB2 = 3;
+        public static final byte COLLECT = 4;
     }
     
     /**
@@ -291,6 +279,10 @@ public class MediaUtil {
         /** 文件夹 value:4 */
         public static final byte FOLDER = 4;
     };
+
+    public static boolean isMediaType(int fileType) {
+        return fileType == FileType.AUDIO || fileType == FileType.VIDEO || fileType == FileType.IMAGE;
+    }
     
     public static int getMediaType(String fileName) {
         int fileType = FileType.NULL;
@@ -474,8 +466,9 @@ public class MediaUtil {
         return false;
     }
     
-    public static String getUserName(Context context) {
+    public static String getUserName() {
         if (sUserName == null) {
+            Context context = MediaApplication.getInstance();
             String infoStr = Settings.System.getString(context.getContentResolver(),"personal_user_info");
             if (infoStr != null) {
                 UserInfoBean userInfoBean = (UserInfoBean) GsonUtil.instance().getObjectFromJson(infoStr, UserInfoBean.class);

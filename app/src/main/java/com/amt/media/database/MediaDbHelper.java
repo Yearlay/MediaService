@@ -255,8 +255,8 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         String tableName = DBConfig.getTableName(mediaBean);
         ContentValues contentValues = new ContentValues();
         contentValues = mediaBean.getContentValues(contentValues);
-        String whereClause = MediaBean.FIELD_FILE_PATH + "=?";
-        String[] whereArgs = new String[] {mediaBean.getFilePath()};
+        String whereClause = MediaBean.FIELD_ID + "=?";
+        String[] whereArgs = new String[] {mediaBean.getId() + ""};
         long ret = sqLiteDatabase.update(tableName, contentValues, whereClause, whereArgs);
         if (ret > 0) {
             notifyChange(tableName);
@@ -268,8 +268,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      * @param tableName
      */
     public void notifyChange(String tableName) {
-        // TODO 通知内容观察者tableName表数据有变化。
-        // mContext.getContentResolver().notifyChange(Uri.parse(DBConfig.getUriAddress(tableName)), null);
+        AllMediaList.instance().notifyChange(tableName);
     }
 
     /**
@@ -354,7 +353,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
                 do {
                     CollectAudioBean collectAudioBean = new CollectAudioBean(cursor);
                     StorageBean storageBean = StorageManager.instance().getStorageBean(collectAudioBean.getPortId());
-                    if (storageBean.isMounted()) {
+                    if (storageBean.isMounted() || allFlag) {
                         collectAudioBeans.add(collectAudioBean);
                     }
                 } while (cursor.moveToNext());
@@ -406,7 +405,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
                 do {
                     CollectVideoBean collectVideoBean = new CollectVideoBean(cursor);
                     StorageBean storageBean = StorageManager.instance().getStorageBean(collectVideoBean.getPortId());
-                    if (storageBean.isMounted()) {
+                    if (storageBean.isMounted() || allFlag) {
                         collectVideoBeans.add(collectVideoBean);
                     }
                 } while (cursor.moveToNext());
@@ -458,7 +457,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
                 do {
                     CollectImageBean collectImageBean = new CollectImageBean(cursor);
                     StorageBean storageBean = StorageManager.instance().getStorageBean(collectImageBean.getPortId());
-                    if (storageBean.isMounted()) {
+                    if (storageBean.isMounted() || allFlag) {
                         collectImageBeans.add(collectImageBean);
                     }
                 } while (cursor.moveToNext());

@@ -27,40 +27,15 @@ public class ID3ParseThread extends Thread {
 
     public void run() {
         DebugClock debugClock = new DebugClock();
-        updateCollectDatas();
+        CollectLogic.fixLogic();
         updateID3Info();
-    }
-
-    /**
-     * 修复下面场景：
-     * 场景_A：U_A插入USB_1；收藏了Audio_A；拔出U_A插入到USB_2; 需要更新收藏的Audio_A的信息。
-     * 场景_B：U_A插入USB_1；收藏了Audio_A；拔出U_A，将U_B插入USB_1; 拔出U_B，重新插入U_A。
-     */
-    public void updateCollectDatas() {
-        DebugClock debugClock = new DebugClock();
-          // 收藏表，需要校验一下。
-//        mMediaDbHelper.setStartFlag(true);
-//        mMediaDbHelper.updateCollectInfoByFileExist(FileType.AUDIO);
-//        mMediaDbHelper.updateCollectInfoByFileExist(FileType.VIDEO);
-//        mMediaDbHelper.updateCollectInfoByFileExist(FileType.IMAGE);
-//        mMediaDbHelper.setStartFlag(false);
-        // 需要针对收藏表来检验对应的媒体表。
-//        mMediaDbHelper.setStartFlag(true);
-//        mMediaDbHelper.updateMediaInfoAccordingToCollect(FileType.AUDIO); // 参照"table_audio19"表更新对应的媒体表。
-//        mMediaDbHelper.updateMediaInfoAccordingToCollect(FileType.VIDEO); // 参照"table_video19"表更新对应的媒体表。
-//        mMediaDbHelper.updateMediaInfoAccordingToCollect(FileType.IMAGE); // 参照"table_image19"表更新对应的媒体表。
-//        mMediaDbHelper.setStartFlag(false);
-        debugClock.calculateTime(TAG, "ID3ParseThread#updateCollectDatas");
+        debugClock.calculateTime(TAG, "ID3ParseThread#run");
+        ScanManager.instance().endID3Parse();
     }
 
     private void updateID3Info() {
-        ArrayList<StorageBean> storageBeans = new ArrayList<StorageBean>();
-        storageBeans.add(StorageManager.instance().getStorageBean(StorageConfig.PortId.SDCARD_PORT));
-        storageBeans.add(StorageManager.instance().getStorageBean(StorageConfig.PortId.USB1_PORT));
-        storageBeans.add(StorageManager.instance().getStorageBean(StorageConfig.PortId.USB2_PORT));
-
         DebugClock debugClock = new DebugClock();
-        for (StorageBean storageBean : storageBeans) {
+        for (StorageBean storageBean : StorageManager.instance().getDefaultStorageBeans()) {
             if (storageBean.isMounted()) {
                 parseMedia(storageBean, MediaUtil.FileType.AUDIO);
                 parseMedia(storageBean, MediaUtil.FileType.VIDEO);

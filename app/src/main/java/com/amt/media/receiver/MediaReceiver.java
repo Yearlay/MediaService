@@ -39,7 +39,7 @@ public class MediaReceiver extends BroadcastReceiver {
             } else if (StorageConfig.USB2_STORAGE_PATH.equals(storagePath)) {
                 sUsb2Mounted = true;
             }
-            startFileService(context, ScanManager.SCAN_STORAGE, storagePath);
+            startFileService(context, ScanManager.MOUNT_STORAGE, storagePath);
         } else if (action.equals(Intent.ACTION_MEDIA_EJECT) || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
             if (StorageConfig.USB1_STORAGE_PATH.equals(storagePath)) {
                 if (!sUsb1Mounted) {

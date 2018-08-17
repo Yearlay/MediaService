@@ -2,6 +2,7 @@ package com.amt.media.bean;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -21,6 +22,10 @@ public class ImageBean extends MediaBean {
         contentValues.put(FIELD_IMAGE_HEIGHT, height);
         contentValues.put(FIELD_THUMBNAIL_PATH, thumbnailPath);
         return contentValues;
+    }
+
+    public ImageBean() {
+        super();
     }
 
     public ImageBean(Cursor cursor) {
@@ -55,6 +60,12 @@ public class ImageBean extends MediaBean {
     }
 
     public void parseID3() {
-
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(getFilePath(), options);
+        height = options.outHeight;
+        width = options.outWidth;
+        setThumbnailPath(null);
+        setId3Flag(1);
     }
 }
