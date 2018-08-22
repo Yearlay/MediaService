@@ -3,8 +3,6 @@ package com.amt.media.datacache;
 import android.os.Handler;
 import android.os.Message;
 
-import com.amt.media.util.DBConfig;
-
 public class LoadHandler extends Handler {
     protected static final int BEGIN_LOAD_ITEM = 1;
     protected static final int END_LOAD_ITEM = 2;
@@ -31,15 +29,10 @@ public class LoadHandler extends Handler {
     }
 
     private void beginLoadItem(String tableName) {
-        synchronized (AllMediaList.mLoadLock) {
-            if (mLoadThread == null) {
-                mLoadThread = new LoadThread();
-            }
-            mLoadThread.addToListAndStart(tableName);
-            if (!mLoadThread.isAlive()) { // 如果线程没有启动， 就start线程。
-                mLoadThread.start();
-            }
+        if (mLoadThread == null) {
+            mLoadThread = new LoadThread();
         }
+        mLoadThread.addToListAndStart(tableName);
     }
 
     private void endLoadItem(String tableName) {

@@ -27,6 +27,8 @@ public class CollectImageBean extends ImageBean {
         return contentValues;
     }
 
+    public CollectImageBean() {}
+
     public CollectImageBean(Cursor cursor) {
         super(cursor);
         username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));

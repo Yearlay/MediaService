@@ -54,6 +54,7 @@ public class ScanManager {
     public void operateIntent(Intent intent) {
         String storagePath = intent.getStringExtra(SCAN_FILE_PATH);
         int portId = StorageConfig.getPortId(storagePath);
+        DebugLog.d(TAG, "operateIntent storagePath: " + storagePath + " && portId:" + portId);
         mHandler.obtainMessage(intent.getIntExtra(SCAN_TYPE_KEY, 0), portId, 0).sendToTarget();
     }
 
@@ -100,19 +101,24 @@ public class ScanManager {
     };
 
     private void removeStorage(int portId) {
+        DebugLog.d(TAG, "removeStorage portId: " + portId);
         StorageManager.instance().updateStorageState(portId, StorageBean.EJECT);
     }
 
     private void mountStorage(int portId) {
+        DebugLog.d(TAG, "mountStorage portId: " + portId);
         StorageManager.instance().updateStorageState(portId, StorageBean.MOUNTED);
         mHandler.obtainMessage(BEGIN_SCAN_STORAGE, portId, 0).sendToTarget();
     }
 
     private void beginScanStorage(int portId) {
+        DebugLog.d(TAG, "beginScanStorage portId: " + portId);
         StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
         if (storageBean.getState() == StorageBean.MOUNTED) {
             StorageManager.instance().updateStorageState(portId, StorageBean.FILE_SCANNING);
-            getScanRootPathThread().addDeviceTask(StorageConfig.getStoragePath(portId));
+            String storagePath = StorageConfig.getStoragePath(portId);
+            DebugLog.d(TAG, "beginScanStorage storagePath:" + storagePath);
+            getScanRootPathThread().addDeviceTask(storagePath);
         } else {
             DebugLog.e(TAG, "Ignore beginScanStorage --> portId: " + portId
                     + " && state:" + storageBean.getState());
@@ -120,6 +126,7 @@ public class ScanManager {
     }
 
     private void endScanStorageEx(int portId, int scanState) {
+        DebugLog.d(TAG, "endScanStorageEx portId: " + portId + " && scanState:" + scanState);
         StorageManager.instance().updateStorageState(portId, scanState);
     }
 

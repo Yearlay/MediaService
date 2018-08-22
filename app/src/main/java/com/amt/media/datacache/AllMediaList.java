@@ -32,7 +32,9 @@ public class AllMediaList {
     protected OperateHandler mOperateHandler;
 
     private Context mContext;
-    private MediaDbHelper mMediaDbHelper;
+    public Context getContext() {
+        return mContext;
+    }
 
     private static AllMediaList mSelf;
 
@@ -50,7 +52,6 @@ public class AllMediaList {
 
     private AllMediaList(Context context) {
         mContext = context;
-        mMediaDbHelper = new MediaDbHelper(mContext);
         mLoadHandler = new LoadHandler();
         mOperateHandler = new OperateHandler();
     }

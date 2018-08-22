@@ -1,12 +1,6 @@
 package com.amt.media.datacache;
 
-import android.provider.MediaStore;
-
 import com.amt.media.bean.MediaBean;
-import com.amt.media.database.MediaDbHelper;
-import com.amt.media.util.DBConfig;
-import com.amt.media.util.MediaUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,28 +9,47 @@ public class LoadThread extends Thread {
 
     List<String> mLoadMsgList = Collections.synchronizedList(new ArrayList<String>());
 
+    private volatile boolean isRunning = false;
+
     public void addToListAndStart(String tableName) {
-        for (int index = 0; index < mLoadMsgList.size(); index++) {
-            if (tableName.equals(mLoadMsgList.get(index))) {
-                return;
+        synchronized (AllMediaList.mLoadLock) {
+            for (int index = 0; index < mLoadMsgList.size(); index++) {
+                if (tableName.equals(mLoadMsgList.get(index))) {
+                    return;
+                }
+            }
+            mLoadMsgList.add(tableName);
+
+            if (!isRunning) {
+                isRunning = true; // 防止非常快速地调用两次addToListAndStart（来不及调用run方法）。
+                try {
+                    start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
-        mLoadMsgList.add(tableName);
     }
 
     @Override
     public void run() {
+        AllMediaList allMediaList = AllMediaList.instance();
         synchronized (AllMediaList.mLoadLock) {
             while (mLoadMsgList.size() > 0) {
                 String tableName = mLoadMsgList.remove(0);
-                AllMediaList allMediaList = AllMediaList.instance();
-                MediaDbHelper mediaDbHelper = MediaDbHelper.instance();
                 ArrayList<MediaBean> mediaBeans = allMediaList.mAllMediaHash.get(tableName);
-                // mediaBeans不可能为空。不用加判空逻辑。
-                mediaBeans.clear();
-                mediaBeans.addAll(mediaDbHelper.query(tableName, null, null, false));
-                allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName);
+                MediaDBInterface mediaDBInterface = MediaDBInterface.instance(allMediaList.getContext());
+                if (mediaBeans == null) {
+                    mediaBeans = new ArrayList<MediaBean>();
+                    allMediaList.mAllMediaHash.put(tableName, mediaBeans);
+                } else {
+                    mediaBeans.clear();
+                }
+                mediaBeans.addAll(mediaDBInterface.query(tableName, null, null));
+                allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName).sendToTarget();
             }
+            isRunning = false;
         }
+        allMediaList.mLoadHandler.sendEmptyMessage(LoadHandler.END_LOAD_THREAD);
     }
 }

@@ -72,7 +72,6 @@ public class ScanThread extends Thread {
     
     private void scanStorage(String storagePath) {
         DebugLog.i(TAG, "scanStorage Path: " + storagePath);
-        AllMediaList allMediaList = AllMediaList.instance(mediaDbHelper.getContext());
         int portId = StorageConfig.getPortId(storagePath);
         int mediaCount = 0;
         int scanState = StorageBean.FILE_SCANNING;
@@ -87,7 +86,7 @@ public class ScanThread extends Thread {
             DebugLog.d(TAG, " Scan check imageCount: " + imageCount
             		+ " && audioCount: " + audioCount + " && videoCount:" + videoCount);
             mediaCount = jniScanRootPath(storagePath, 1);
-            if (mediaCount != (imageCount + audioCount + videoCount)) {
+            if (mediaCount != (imageCount + audioCount + videoCount) || true) {
                 DebugLog.d(TAG, " Scan check failed; Begin rescan !!!!!");
                 mediaDbHelper.clearStorageData(portId);
                 mediaDbHelper.setStartFlag(true);

@@ -27,6 +27,8 @@ public class CollectVideoBean extends VideoBean {
         return contentValues;
     }
 
+    public CollectVideoBean() {}
+
     public CollectVideoBean(Cursor cursor) {
         super(cursor);
         username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));

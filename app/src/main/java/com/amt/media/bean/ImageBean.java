@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 
+import com.amt.util.DebugLog;
+
 /**
  * Created by archermind on 2018/8/9.
  */
@@ -26,6 +28,20 @@ public class ImageBean extends MediaBean {
 
     public ImageBean() {
         super();
+    }
+
+    public ImageBean(MediaBean mediaBean) {
+        setPortId(mediaBean.getPortId());
+        setFileType(mediaBean.getFileType());
+        setFilePath(mediaBean.getFilePath());
+        setFileName(mediaBean.getFileName());
+        setFileNamePY(mediaBean.getFileNamePY());
+        setFileSize(mediaBean.getFileSize());
+        setLastDate(mediaBean.getLastDate());
+        setOnlyreadFlag(mediaBean.getOnlyreadFlag());
+        setId3Flag(mediaBean.getId3Flag());
+        setUnsupportFlag(mediaBean.getUnsupportFlag());
+        setCollectFlag(mediaBean.getCollectFlag());
     }
 
     public ImageBean(Cursor cursor) {

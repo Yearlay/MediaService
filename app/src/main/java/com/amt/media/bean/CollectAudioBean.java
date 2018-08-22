@@ -27,6 +27,8 @@ public class CollectAudioBean extends AudioBean {
         return contentValues;
     }
 
+    public CollectAudioBean() {}
+
     public CollectAudioBean(Cursor cursor) {
         super(cursor);
         username = cursor.getString(cursor.getColumnIndex(FIELD_USERNAME));

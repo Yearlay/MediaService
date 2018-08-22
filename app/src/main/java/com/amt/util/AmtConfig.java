@@ -14,7 +14,7 @@ public class AmtConfig {
     /**
      * 激活所有日志log，debug状态
      */
-    public static final boolean ENABLE_DEBUG_LOG = false;
+    public static final boolean ENABLE_DEBUG_LOG = true;
     /**
      * 激活ID3专辑图的暗码
      */

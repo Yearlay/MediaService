@@ -1,9 +1,12 @@
 package com.amt.media.util;
 
+import com.amt.media.bean.AudioBean;
 import com.amt.media.bean.CollectAudioBean;
 import com.amt.media.bean.CollectImageBean;
 import com.amt.media.bean.CollectVideoBean;
+import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
+import com.amt.media.bean.VideoBean;
 
 /**
  * Created by archermind on 2018/8/9.
@@ -17,7 +20,7 @@ public class DBConfig {
     /**
      * 数据库的版本号：当前是1。
      */
-    public final static int DATABASE_VERSION = 1;
+    public final static int DATABASE_VERSION = 2;
 
     public class DBTable {
         public final static String SDCARD_AUDIO = "sdcard_audio";

@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
+import com.amt.util.DebugLog;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -112,8 +113,8 @@ public class MediaBean {
 
     public MediaBean(Cursor cursor) {
         id = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
-        portId = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
-        fileType = cursor.getInt(cursor.getColumnIndex(FIELD_ID));
+        portId = cursor.getInt(cursor.getColumnIndex(FIELD_PORT_ID));
+        fileType = cursor.getInt(cursor.getColumnIndex(FIELD_FILE_TYPE));
         filePath = cursor.getString(cursor.getColumnIndex(FIELD_FILE_PATH));
         fileName = cursor.getString(cursor.getColumnIndex(FIELD_FILE_NAME));
         fileNamePY = cursor.getString(cursor.getColumnIndex(FIELD_FILE_NAME_PY));
@@ -249,6 +250,25 @@ public class MediaBean {
 
     public void parseID3() {
 
+    }
+
+    @Override
+    public String toString() {
+        return "MediaBean{" +
+                "id=" + id +
+                ", portId=" + portId +
+                ", fileType=" + fileType +
+                ", filePath='" + filePath + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", fileNamePY='" + fileNamePY + '\'' +
+                ", fileSize=" + fileSize +
+                ", lastDate='" + lastDate + '\'' +
+                ", onlyreadFlag=" + onlyreadFlag +
+                ", id3Flag=" + id3Flag +
+                ", unsupportFlag=" + unsupportFlag +
+                ", collectFlag=" + collectFlag +
+                ", isSelected=" + isSelected +
+                '}';
     }
 
     protected String getMD5Str(FileInputStream is)

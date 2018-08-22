@@ -24,18 +24,21 @@ jmethodID mediaBeanID;
 jclass scanJniClass;
 jmethodID insertToDbID;
 
+extern "C" int readFileList(JNIEnv* env, jobject thiz, const char *basePath, int);
+
 extern "C"
 JNIEXPORT jstring
-
 JNICALL
-Java_com_amt_media_jni_ScanJni_stringFromJNI(
+Java_com_amt_media_jni_ScanJni_stringFromJni(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
 
-jstring Java_com_amt_media_jni_ScanJni_getPY
+extern "C"
+JNIEXPORT jstring
+JNICALL Java_com_amt_media_jni_ScanJni_getPY
         (JNIEnv* env, jobject thiz, jstring jfileName)
 {
     const char *filename = env->GetStringUTFChars(jfileName, 0);
@@ -51,6 +54,23 @@ jstring Java_com_amt_media_jni_ScanJni_getPY
     return env->NewStringUTF(fileNamePY);
 }
 
+extern "C"
+JNIEXPORT jint
+JNICALL Java_com_amt_media_jni_ScanJni_scanRootPath
+        (JNIEnv* env, jobject thiz, jstring rootPath, jint onlyGetMediaSizeFlag)
+{
+    fileNodeClass = env->FindClass("com/amt/media/bean/MediaBean");
+    mediaBeanID = env->GetMethodID(fileNodeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+    scanJniClass = env->FindClass("com/amt/media/jni/ScanJni");
+    insertToDbID = env->GetMethodID(scanJniClass, "insertToDb", "(Lcom/amt/media/bean/MediaBean;)V");
+
+    const char *basePath = env->GetStringUTFChars(rootPath, 0);
+    int count = readFileList(env, thiz, basePath, (int)onlyGetMediaSizeFlag);
+    env->ReleaseStringUTFChars(rootPath, basePath);
+    return (jint)count;
+}
+
+extern "C"
 int judgeMediaType(char *fileName) {
     char *endStr = fileName;
     char *tmp;
@@ -82,6 +102,7 @@ int judgeMediaType(char *fileName) {
     return TYPE_FILE;
 }
 
+extern "C"
 int addToDb(JNIEnv* env, jobject thiz, char *filePath, char *fileName, long fileSize, int onlyGetMediaSizeFlag) {
     int ret = 0;
     int fileType = judgeMediaType(fileName);
@@ -118,6 +139,7 @@ int addToDb(JNIEnv* env, jobject thiz, char *filePath, char *fileName, long file
     return ret;
 }
 
+extern "C"
 int readFileList(JNIEnv* env, jobject thiz, const char *basePath, int onlyGetMediaSizeFlag)
 {
     int mediaCount = 0;
@@ -174,18 +196,4 @@ int readFileList(JNIEnv* env, jobject thiz, const char *basePath, int onlyGetMed
     }
     closedir(dir);
     return mediaCount;
-}
-
-jint Java_com_amt_media_jni_ScanJni_scanRootPath
-        (JNIEnv* env, jobject thiz, jstring rootPath, jint onlyGetMediaSizeFlag)
-{
-    fileNodeClass = env->FindClass("com/amt/media/bean/MediaBean");
-    mediaBeanID = env->GetMethodID(fileNodeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    scanJniClass = env->FindClass("com/amt/media/jni/ScanJni");
-    insertToDbID = env->GetMethodID(scanJniClass, "insertToDb", "(Lcom/amt/media/bean/MediaBean;)V");
-
-    const char *basePath = env->GetStringUTFChars(rootPath, 0);
-    int count = readFileList(env, thiz, basePath, (int)onlyGetMediaSizeFlag);
-    env->ReleaseStringUTFChars(rootPath, basePath);
-    return (jint)count;
 }

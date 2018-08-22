@@ -9,7 +9,6 @@ import com.amt.media.bean.CollectVideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.VideoBean;
-import com.amt.media.database.MediaDbHelper;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.util.DebugLog;
@@ -28,10 +27,10 @@ public class OperateThread extends Thread {
     private static final String TAG = "OperateThread";
 
     private AllMediaList mAllMediaList;
-    private MediaDbHelper mMediaDbHelper;
+    private MediaDBInterface mMediaDbInterface;
     public OperateThread() {
         mAllMediaList = AllMediaList.instance();
-        mMediaDbHelper = MediaDbHelper.instance();
+        mMediaDbInterface = MediaDBInterface.instance(mAllMediaList.getContext());
     }
 
     public static class OperateData {
@@ -103,7 +102,6 @@ public class OperateThread extends Thread {
         DebugLog.a(TAG, "deleteMediaFiles", "Begin --> delte files && size:" + list.size());
         int resultCode = OperateListener.OPERATE_SUCEESS;
         int fileIndex = 0;
-        mMediaDbHelper.setStartFlag(true);
         for (MediaBean mediaBean : list) {
             if (thread.isInterrupted()) {
                 DebugLog.e(TAG, "Interrupte deleteMediaFiles break for!");
@@ -138,10 +136,10 @@ public class OperateThread extends Thread {
                     } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
                         collectBean = new CollectImageBean((ImageBean) mediaBean);
                     }
-                    mMediaDbHelper.delete(collectBean);
+                    mMediaDbInterface.delete(collectBean);
                 }
                 // 删除媒体表中的数据。
-                mMediaDbHelper.delete(mediaBean);
+                mMediaDbInterface.delete(mediaBean);
             }
             mCurrentprogress = (fileIndex * 100) / list.size();
             Message message = mAllMediaList.mOperateHandler.obtainMessage(
@@ -151,7 +149,6 @@ public class OperateThread extends Thread {
             mAllMediaList.mOperateHandler.sendMessage(message);
             fileIndex++;
         }
-        mMediaDbHelper.setStartFlag(false);
         DebugLog.a(TAG, "deleteMediaFiles", "End --> delete files resultCode:" + resultCode);
     }
 
@@ -159,13 +156,12 @@ public class OperateThread extends Thread {
         DebugLog.a(TAG, "collectMediaFiles", "Begin --> collect media files && size:" + list.size());
         int resultCode = OperateListener.OPERATE_SUCEESS;
         int fileIndex = 0;
-        mMediaDbHelper.setStartFlag(true);
         for (MediaBean mediaBean : list) {
             if(mediaBean.getCollectFlag() == 1) {
                 break;
             }
             mediaBean.setCollectFlag(1);
-            mMediaDbHelper.update(mediaBean); // 先更新 对应的媒体表中的数据。
+            mMediaDbInterface.update(mediaBean); // 先更新 对应的媒体表中的数据。
 
             // 再插入对应的收藏表。
             MediaBean collectBean = null;
@@ -177,7 +173,7 @@ public class OperateThread extends Thread {
                 collectBean = new CollectImageBean((ImageBean) mediaBean);
             }
             if (collectBean != null) {
-                mMediaDbHelper.insert(collectBean);
+                mMediaDbInterface.insert(collectBean);
             }
 
             fileIndex++;
@@ -188,7 +184,6 @@ public class OperateThread extends Thread {
             );
             mAllMediaList.mOperateHandler.sendMessage(message);
         }
-        mMediaDbHelper.setStartFlag(false);
         DebugLog.a(TAG, "collectMediaFiles", "End --> collect media files resultCode:" + resultCode);
     }
 
@@ -196,7 +191,6 @@ public class OperateThread extends Thread {
         DebugLog.a(TAG, "unCollectMediaFiles", "Begin --> uncollect media files && size:" + list.size());
         int resultCode = OperateListener.OPERATE_SUCEESS;
         int fileIndex = 0;
-        mMediaDbHelper.setStartFlag(true);
         for (MediaBean mediaBean : list) {
             boolean isFromCollectTable = (mediaBean instanceof CollectAudioBean) ||
                     (mediaBean instanceof CollectImageBean) ||
@@ -204,7 +198,7 @@ public class OperateThread extends Thread {
             if (!isFromCollectTable) { // 来自媒体表。
                 // 先更新媒体表的数据。
                 mediaBean.setCollectFlag(0);
-                mMediaDbHelper.update(mediaBean);
+                mMediaDbInterface.update(mediaBean);
                 // 然后再删除收藏表中的数据
                 MediaBean collectBean = null;
                 if (mediaBean.getFileType() == MediaUtil.FileType.AUDIO) {
@@ -214,20 +208,20 @@ public class OperateThread extends Thread {
                 } else if (mediaBean.getFileType() == MediaUtil.FileType.IMAGE) {
                     collectBean = new CollectImageBean((ImageBean) mediaBean);
                 }
-                mMediaDbHelper.delete(collectBean);
+                mMediaDbInterface.delete(collectBean);
             } else { // 来自收藏表。
                 // 先删除收藏表数据。
-                mMediaDbHelper.delete(mediaBean);
+                mMediaDbInterface.delete(mediaBean);
                 // TODO 然后更新媒体表中的数据。
                 String tableName = DBConfig.getTableName(mediaBean.getPortId(), mediaBean.getFileType());
-                ArrayList<MediaBean> beans = mMediaDbHelper.query(tableName,
+                ArrayList<MediaBean> beans = mMediaDbInterface.query(tableName,
                         MediaBean.FIELD_FILE_PATH + "=?",
-                        new String[]{mediaBean.getFilePath()}, false);
+                        new String[]{mediaBean.getFilePath()});
                 if (beans.size() == 1) {
                     MediaBean bean = beans.get(0);
                     if (bean.getCollectFlag() == 1) { // 收藏标志位1
                         bean.setCollectFlag(0);       // 修改收藏标志为0
-                        mMediaDbHelper.update(bean);  // 更新数据库。
+                        mMediaDbInterface.update(bean);  // 更新数据库。
                     }
                 } else {
                     DebugLog.e(TAG, "unCollectMediaFiles exception list size: " + list.size() +
@@ -243,7 +237,6 @@ public class OperateThread extends Thread {
             );
             mAllMediaList.mOperateHandler.sendMessage(message);
         }
-        mMediaDbHelper.setStartFlag(false);
         DebugLog.a(TAG, "unCollectMediaFiles", "End --> uncollect media files resultCode:" + resultCode);
     }
 
@@ -251,7 +244,6 @@ public class OperateThread extends Thread {
         DebugLog.a(TAG, "copyToLocal", "Begin --> copy media files && size:" + list.size());
         int resultCode = OperateListener.OPERATE_SUCEESS;
         int fileIndex = 0;
-        mMediaDbHelper.setStartFlag(true);
         for (MediaBean mediaBean : list) {
             if (thread.isInterrupted()) {
                 DebugLog.e(TAG, "Interrupte deleteMediaFiles break for!");
@@ -265,8 +257,8 @@ public class OperateThread extends Thread {
                 // 如果数据库中这个文件的记录，先要执行delete，然后再执行插入insert。
                 MediaBean copyMediaBean = new MediaBean(destFilePath,
                         mediaBean.getFileName(), mediaBean.getFileNamePY(), mediaBean.getFileType());
-                mMediaDbHelper.delete(copyMediaBean);
-                mMediaDbHelper.insert(copyMediaBean);
+                mMediaDbInterface.delete(copyMediaBean);
+                mMediaDbInterface.insert(copyMediaBean);
             } else { // 文件拷贝失败。
                 resultCode = OperateListener.OPERATE_COLLECT_COPY_FILE_FAILED;
                 DebugLog.e(TAG, "copyToLocal exception OPERATE_COLLECT_COPY_FILE_FAILED");
@@ -286,7 +278,6 @@ public class OperateThread extends Thread {
                 break;
             }
         }
-        mMediaDbHelper.setStartFlag(false);
         DebugLog.a(TAG, "copyToLocal", "End --> copy media files resultCode:" + resultCode);
     }
 
@@ -294,7 +285,6 @@ public class OperateThread extends Thread {
         DebugLog.a(TAG, "copyToLocalForFileSize", "Begin --> copy media files && size:" + list.size());
         int resultCode = OperateListener.OPERATE_SUCEESS;
         mCurrentprogress = 0;
-        mMediaDbHelper.setStartFlag(true);
         long totalSize = 0;
         long docopySize = 0;
         for (MediaBean mediaBean : list) {
@@ -370,8 +360,8 @@ public class OperateThread extends Thread {
                 // 文件拷贝成功。将拷贝后的文件信息添加到数据库中。
                 MediaBean copyMediaBean = new MediaBean(destFilePath,
                         mediaBean.getFileName(), mediaBean.getFileNamePY(), mediaBean.getFileType());
-                mMediaDbHelper.delete(copyMediaBean);
-                mMediaDbHelper.insert(copyMediaBean);
+                mMediaDbInterface.delete(copyMediaBean);
+                mMediaDbInterface.insert(copyMediaBean);
             } else { // 文件拷贝失败。
                 resultCode = OperateListener.OPERATE_COLLECT_COPY_FILE_FAILED;
                 DebugLog.e(TAG, "copyToLocalForFileSize exception OPERATE_COLLECT_COPY_FILE_FAILED");
@@ -390,7 +380,6 @@ public class OperateThread extends Thread {
                 mCurrentprogress, resultCode, operateData
         );
         mAllMediaList.mOperateHandler.sendMessage(message);
-        mMediaDbHelper.setStartFlag(false);
         DebugLog.a(TAG, "copyToLocalForFileSize", "End --> copy media files resultCode:" + resultCode);
     }
 }

@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.amt.bt.BtMusicManager;
+import com.amt.media.datacache.AllMediaList;
 import com.amt.media.scan.ScanManager;
 import com.amt.radio.RadioManager;
 
@@ -32,6 +33,7 @@ public class MediaService extends Service {
         super.onCreate();
 
         BtMusicManager.getInstance();
+        AllMediaList.instance();
         mBinder = new MediaServiceBinder();
     }
 

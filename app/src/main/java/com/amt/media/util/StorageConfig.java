@@ -45,10 +45,10 @@ public class StorageConfig {
         }
         if (filePath.startsWith(SDCARD_STORAGE_PATH)) {
             return PortId.SDCARD_PORT;
-        } else if (filePath.startsWith(USB1_STORAGE_PATH)) {
-            return PortId.USB1_PORT;
         } else if (filePath.startsWith(USB2_STORAGE_PATH)) {
             return PortId.USB2_PORT;
+        } else if (filePath.startsWith(USB1_STORAGE_PATH)) {
+            return PortId.USB1_PORT;
         }
         return portID;
     }

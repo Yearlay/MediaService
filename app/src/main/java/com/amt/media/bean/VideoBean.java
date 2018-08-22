@@ -36,6 +36,20 @@ public class VideoBean extends MediaBean {
         super();
     }
 
+    public VideoBean(MediaBean mediaBean) {
+        setPortId(mediaBean.getPortId());
+        setFileType(mediaBean.getFileType());
+        setFilePath(mediaBean.getFilePath());
+        setFileName(mediaBean.getFileName());
+        setFileNamePY(mediaBean.getFileNamePY());
+        setFileSize(mediaBean.getFileSize());
+        setLastDate(mediaBean.getLastDate());
+        setOnlyreadFlag(mediaBean.getOnlyreadFlag());
+        setId3Flag(mediaBean.getId3Flag());
+        setUnsupportFlag(mediaBean.getUnsupportFlag());
+        setCollectFlag(mediaBean.getCollectFlag());
+    }
+
     public VideoBean(Cursor cursor) {
         super(cursor);
         duration = cursor.getInt(cursor.getColumnIndex(FIELD_DURATION));
