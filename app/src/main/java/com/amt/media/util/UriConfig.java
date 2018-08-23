@@ -110,4 +110,34 @@ public class UriConfig {
         }
         return address;
     }
+
+    public static String getTableName(String uriAddress) {
+        String tableName = null;
+        if (URI_SDCARD_AUDIO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.SDCARD_AUDIO;
+        } else if (URI_SDCARD_VIDEO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.SDCARD_VIDEO;
+        } else if (URI_SDCARD_IMAGE_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.SDCARD_IMAGE;
+        } else if (URI_USB1_AUDIO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB1_AUDIO;
+        } else if (URI_USB1_VIDEO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB1_VIDEO;
+        } else if (URI_USB1_IMAGE_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB1_IMAGE;
+        } else if (URI_USB2_AUDIO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB2_AUDIO;
+        } else if (URI_USB2_VIDEO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB2_VIDEO;
+        } else if (URI_USB2_IMAGE_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.USB2_IMAGE;
+        } else if (URI_COLLECT_AUDIO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.COLLECT_AUDIO;
+        } else if (URI_COLLECT_VIDEO_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.COLLECT_VIDEO;
+        } else if (URI_COLLECT_IMAGE_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.COLLECT_IMAGE;
+        }
+        return tableName;
+    }
 }

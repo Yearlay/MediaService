@@ -2,6 +2,9 @@ package com.amt.media.datacache;
 
 import android.app.Application;
 import android.content.Context;
+import android.database.ContentObserver;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.Message;
 
 import com.amt.media.bean.MediaBean;
@@ -10,6 +13,7 @@ import com.amt.media.database.MediaDbHelper;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
+import com.amt.media.util.UriConfig;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 
@@ -30,6 +34,7 @@ public class AllMediaList {
     protected LoadHandler mLoadHandler;
     protected ArrayList<LoadListener> mLoadListeners = new ArrayList<LoadListener>();
     protected OperateHandler mOperateHandler;
+    private ArrayList<MediaContentObserver> mObserverList = new ArrayList<MediaContentObserver>();
 
     private Context mContext;
     public Context getContext() {
@@ -54,6 +59,41 @@ public class AllMediaList {
         mContext = context;
         mLoadHandler = new LoadHandler();
         mOperateHandler = new OperateHandler();
+
+        registerObserverAll();
+    }
+
+    private void registerObserverAll() {
+        unRegisterObserverAll();
+        registerObserver(UriConfig.URI_SDCARD_AUDIO_ADDR);
+        registerObserver(UriConfig.URI_SDCARD_VIDEO_ADDR);
+        registerObserver(UriConfig.URI_SDCARD_IMAGE_ADDR);
+
+        registerObserver(UriConfig.URI_USB1_AUDIO_ADDR);
+        registerObserver(UriConfig.URI_USB1_VIDEO_ADDR);
+        registerObserver(UriConfig.URI_USB1_IMAGE_ADDR);
+
+        registerObserver(UriConfig.URI_USB2_AUDIO_ADDR);
+        registerObserver(UriConfig.URI_USB2_VIDEO_ADDR);
+        registerObserver(UriConfig.URI_USB2_IMAGE_ADDR);
+
+        registerObserver(UriConfig.URI_COLLECT_AUDIO_ADDR);
+        registerObserver(UriConfig.URI_COLLECT_VIDEO_ADDR);
+        registerObserver(UriConfig.URI_COLLECT_IMAGE_ADDR);
+    }
+
+    private void registerObserver(String UriStr) {
+        MediaContentObserver observer = new MediaContentObserver(new Handler());
+        mContext.getContentResolver().registerContentObserver(Uri.parse(UriStr), true, observer);
+        mObserverList.add(observer);
+    }
+
+
+    public void unRegisterObserverAll() {
+        while (mObserverList.size() > 0) {
+            MediaContentObserver observer = mObserverList.remove(0);
+            mContext.getContentResolver().unregisterContentObserver(observer);
+        }
     }
 
     /**
@@ -231,5 +271,25 @@ public class AllMediaList {
         Message message = mOperateHandler.obtainMessage(operateValue,
                 new OperateThread.OperateData(operateValue, beans, listener));
         mOperateHandler.sendMessage(message);
+    }
+
+    class MediaContentObserver extends ContentObserver {
+        public MediaContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            String uriAddr = uri.toString();
+            DebugLog.d(TAG, "onChange uri: " + uriAddr);
+            String tableName = UriConfig.getTableName(uriAddr);
+            int portId = DBConfig.getPortId(tableName);
+            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            if (storageBean.getState() >= StorageBean.ID3_PARSE_OVER) {
+                DebugLog.d(TAG, "ID3_PARSE_OVER onChange uri: " + uriAddr);
+                notifyChange(tableName);
+            }
+        }
     }
 }

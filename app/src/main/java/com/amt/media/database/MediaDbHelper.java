@@ -15,10 +15,8 @@ import com.amt.media.bean.StorageBean;
 import com.amt.media.bean.VideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
-import com.amt.media.datacache.AllMediaList;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
-import com.amt.media.util.MediaUtil;
 import com.amt.media.util.MediaUtil.FileType;
 import com.amt.media.util.UriConfig;
 import com.amt.mediaservice.MediaApplication;
@@ -282,7 +280,6 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      * @param tableName
      */
     public void notifyChange(String tableName) {
-        AllMediaList.instance().notifyChange(tableName);
         mContext.getContentResolver().notifyChange(Uri.parse(UriConfig.getUriAddress(tableName)), null);
     }
 
