@@ -2,7 +2,7 @@ package com.amt.media.util;
 
 public class UriConfig {
     public static final String URI_HEAD = "content://";
-    public static final String MEDIA_DB_AUTOHORITY = "com.haoke.media.contentprovider";
+    public static final String MEDIA_DB_AUTOHORITY = "com.amt.media.contentprovider";
 
     public static final String URI_SDCARD_AUDIO_ADDR = URI_HEAD + MEDIA_DB_AUTOHORITY + "/" + DBConfig.DBTable.SDCARD_AUDIO;
     public static final String URI_SDCARD_VIDEO_ADDR = URI_HEAD + MEDIA_DB_AUTOHORITY + "/" + DBConfig.DBTable.SDCARD_VIDEO;

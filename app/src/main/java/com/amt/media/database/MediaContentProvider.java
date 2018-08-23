@@ -51,7 +51,7 @@ public class MediaContentProvider extends ContentProvider {
         String tableName = UriConfig.getTableNameByUriType(mUriMatcher.match(uri));
         SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         if (tableName != null) {
-            db.query(tableName, projection, selection, selectionArgs, null, null, null);
+            cursor = db.query(tableName, projection, selection, selectionArgs, null, null, null);
         }
         return cursor;
     }
@@ -70,7 +70,7 @@ public class MediaContentProvider extends ContentProvider {
         if (tableName != null) {
             db.insert(tableName, null, contentValues);
         }
-        return null;
+        return uri;
     }
 
     @Override

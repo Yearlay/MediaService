@@ -43,12 +43,15 @@ public class LoadThread extends Thread {
                 String tableName = mLoadMsgList.remove(0);
                 DebugLog.d("LoadThread", "run() tableName: " + tableName);
                 ArrayList<MediaBean> mediaBeans = MediaDatas.getMediaList(tableName);
-                MediaDBInterface mediaDBInterface = MediaDBInterface.instance(allMediaList.getContext());
-
                 mediaBeans.clear();
                 // TODO 切换查询的方式。
-//                mediaBeans.addAll(mediaDBInterface.query(tableName, null, null));
-                mediaBeans.addAll(MediaDbHelper.instance().query(tableName, null, null, false));
+                boolean useProvider = true;
+                if (useProvider) {
+                    MediaDBInterface mediaDBInterface = MediaDBInterface.instance(allMediaList.getContext());
+                    mediaBeans.addAll(mediaDBInterface.query(tableName, null, null));
+                } else {
+                    mediaBeans.addAll(MediaDbHelper.instance().query(tableName, null, null, false));
+                }
                 DebugLog.d("LoadThread", "run() mediaBeans size: " + mediaBeans.size());
                 allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName).sendToTarget();
             }
