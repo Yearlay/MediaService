@@ -23,6 +23,8 @@ public class DBConfig {
     public final static int DATABASE_VERSION = 2;
 
     public class DBTable {
+        public final static int TABLE_COUNT = 12;
+
         public final static String SDCARD_AUDIO = "sdcard_audio";
         public final static String SDCARD_VIDEO = "sdcard_video";
         public final static String SDCARD_IMAGE = "sdcard_image";

@@ -9,6 +9,7 @@ import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
+import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugClock;
 import com.amt.util.DebugLog;
 

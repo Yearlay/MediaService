@@ -2,6 +2,7 @@ package com.amt.media.database;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.UriConfig;
+import com.amt.mediaservice.MediaApplication;
 
 public class MediaContentProvider extends ContentProvider {
 
@@ -37,7 +39,7 @@ public class MediaContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mMediaDbHelper = MediaDbHelper.instance();
+        Context context = MediaApplication.getInstance();
         return false;
     }
 
@@ -47,7 +49,7 @@ public class MediaContentProvider extends ContentProvider {
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         Cursor cursor = null;
         String tableName = UriConfig.getTableNameByUriType(mUriMatcher.match(uri));
-        SQLiteDatabase db = mMediaDbHelper.getWritableDatabase();
+        SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         if (tableName != null) {
             db.query(tableName, projection, selection, selectionArgs, null, null, null);
         }
@@ -64,7 +66,7 @@ public class MediaContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
         String tableName = UriConfig.getTableNameByUriType(mUriMatcher.match(uri));
-        SQLiteDatabase db = mMediaDbHelper.getWritableDatabase();
+        SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         if (tableName != null) {
             db.insert(tableName, null, contentValues);
         }
@@ -74,7 +76,7 @@ public class MediaContentProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         String tableName = UriConfig.getTableNameByUriType(mUriMatcher.match(uri));
-        SQLiteDatabase db = mMediaDbHelper.getWritableDatabase();
+        SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         int ret = 0;
         if (tableName != null) {
             db.delete(tableName, selection, selectionArgs);
@@ -86,7 +88,7 @@ public class MediaContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues,
                       @Nullable String selection, @Nullable String[] selectionArgs) {
         String tableName = UriConfig.getTableNameByUriType(mUriMatcher.match(uri));
-        SQLiteDatabase db = mMediaDbHelper.getWritableDatabase();
+        SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         int ret = 0;
         if (tableName != null) {
             db.update(tableName, contentValues, selection, selectionArgs);

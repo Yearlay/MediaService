@@ -24,13 +24,12 @@ import java.util.HashMap;
  * Created by archermind on 2018/8/9.
  */
 
-public class AllMediaList {
+public class AllMediaList implements StorageListener {
     private static final String TAG = "AllMediaList";
 
     protected static Object mLoadLock = new Object();
 
     // KEY是tableName。
-    protected HashMap<String, ArrayList<MediaBean>> mAllMediaHash = new HashMap<String, ArrayList<MediaBean>>();
     protected LoadHandler mLoadHandler;
     protected ArrayList<LoadListener> mLoadListeners = new ArrayList<LoadListener>();
     protected OperateHandler mOperateHandler;
@@ -61,6 +60,7 @@ public class AllMediaList {
         mOperateHandler = new OperateHandler();
 
         registerObserverAll();
+        StorageManager.instance().registerStorageListener(this);
     }
 
     private void registerObserverAll() {
@@ -89,7 +89,7 @@ public class AllMediaList {
     }
 
 
-    public void unRegisterObserverAll() {
+    private void unRegisterObserverAll() {
         while (mObserverList.size() > 0) {
             MediaContentObserver observer = mObserverList.remove(0);
             mContext.getContentResolver().unregisterContentObserver(observer);
@@ -127,24 +127,14 @@ public class AllMediaList {
             if (storageBean.getState() >= StorageBean.FILE_SCAN_OVER) {
                 for (int fileType : fileTypes) {
                     String tableName = DBConfig.getTableName(storageBean.getPortId(), fileType);
-                    ArrayList<MediaBean> mediaBeans = mAllMediaHash.get(tableName);
-                    if (mediaBeans == null) {
-                        mediaBeans = new ArrayList<MediaBean>();
-                        mAllMediaHash.put(tableName, mediaBeans);
-                        mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
-                    }
+                    mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
                 }
             }
         }
         // 收藏表数据检查。
         for (int fileType : fileTypes) {
             String collectTableName = DBConfig.getCollectTableName(fileType);
-            ArrayList<MediaBean> collectMediaBeans = mAllMediaHash.get(collectTableName);
-            if (collectMediaBeans == null) {
-                collectMediaBeans = new ArrayList<MediaBean>();
-                mAllMediaHash.put(collectTableName, collectMediaBeans);
-                mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, collectTableName).sendToTarget();
-            }
+            mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, collectTableName).sendToTarget();
         }
     }
 
@@ -155,52 +145,20 @@ public class AllMediaList {
             StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
             // storageBean == null: 是收藏表 或者 是错误地址。
             boolean collectFlag = DBConfig.isCollectTable(tableName);
+            DebugLog.e(TAG, "getMediaList tableName: " + tableName);
             if (collectFlag ||
                     (storageBean != null && storageBean.getState() >= StorageBean.FILE_SCAN_OVER)) {
-                mediaBeans = mAllMediaHash.get(tableName);
-                if (mediaBeans == null) {
-                    mediaBeans = new ArrayList<MediaBean>();
-                    mAllMediaHash.put(tableName, mediaBeans);
+                mediaBeans = MediaDatas.getMediaList(tableName);
+                if (mediaBeans.size() == 0) {
+                    DebugLog.e(TAG, "getMediaList mediaBeans.size() == 0  BEGIN_LOAD_ITEM tableName:" + tableName);
                     mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
                 }
+                DebugLog.e(TAG, "getMediaList mediaBeans size: " + mediaBeans.size());
             }
-            return  mediaBeans;
-        }
-    }
-
-    // 暂时废弃。
-    private ArrayList<MediaBean> getMediaList(int portId, int fileType) {
-        synchronized (mLoadLock) {
-            ArrayList<MediaBean> mediaBeans = null;
-            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
-            if (storageBean.getState() >= StorageBean.FILE_SCAN_OVER) {
-                String tableName = DBConfig.getTableName(portId, fileType);
-                mediaBeans = mAllMediaHash.get(tableName);
-                if (mediaBeans == null) {
-                    mediaBeans = new ArrayList<MediaBean>();
-                    mAllMediaHash.put(tableName, mediaBeans);
-                    mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
-                }
-            } else {
-                DebugLog.e(TAG, "getMediaList error info --> portId: " + portId +
-                        " && state: " + storageBean.getState());
-            }
-            return  mediaBeans;
-        }
-    }
-
-    // 暂时废弃。
-    private ArrayList<MediaBean> getCollectMediaList(int fileType) {
-        synchronized (mLoadLock) {
-            ArrayList<MediaBean> mediaBeans = null;
-            String tableName = DBConfig.getCollectTableName(fileType);
-            mediaBeans = mAllMediaHash.get(tableName);
             if (mediaBeans == null) {
                 mediaBeans = new ArrayList<MediaBean>();
-                mAllMediaHash.put(tableName, mediaBeans);
-                mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
             }
-            return  mediaBeans;
+            return mediaBeans;
         }
     }
 
@@ -271,6 +229,24 @@ public class AllMediaList {
         Message message = mOperateHandler.obtainMessage(operateValue,
                 new OperateThread.OperateData(operateValue, beans, listener));
         mOperateHandler.sendMessage(message);
+    }
+
+    @Override
+    public void onScanStateChange(StorageBean storageBean) {
+        int portId = storageBean.getPortId();
+        DebugLog.d(TAG, "onScanStateChange storageBean portId:" + portId + " && state: " + storageBean.getState());
+        if (storageBean.getState() >= StorageBean.ID3_PARSE_OVER) {
+            ArrayList<MediaBean> audioBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.AUDIO));
+            ArrayList<MediaBean> videoBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.VIDEO));
+            ArrayList<MediaBean> imageBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.IMAGE));
+            StorageManager.instance().updateStorageMediaCount(portId,
+                    audioBeans.size(), videoBeans.size(), imageBeans.size());
+        }
+    }
+
+    @Override
+    public void onMediaCountChange(StorageBean storageBean) {
+        DebugLog.d(TAG, "onMediaCountChange .....");
     }
 
     class MediaContentObserver extends ContentObserver {

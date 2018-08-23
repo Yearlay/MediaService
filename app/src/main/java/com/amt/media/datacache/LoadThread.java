@@ -1,6 +1,10 @@
 package com.amt.media.datacache;
 
 import com.amt.media.bean.MediaBean;
+import com.amt.media.database.MediaDbHelper;
+import com.amt.mediaservice.MediaApplication;
+import com.amt.util.DebugLog;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,15 +41,15 @@ public class LoadThread extends Thread {
         synchronized (AllMediaList.mLoadLock) {
             while (mLoadMsgList.size() > 0) {
                 String tableName = mLoadMsgList.remove(0);
-                ArrayList<MediaBean> mediaBeans = allMediaList.mAllMediaHash.get(tableName);
+                DebugLog.d("LoadThread", "run() tableName: " + tableName);
+                ArrayList<MediaBean> mediaBeans = MediaDatas.getMediaList(tableName);
                 MediaDBInterface mediaDBInterface = MediaDBInterface.instance(allMediaList.getContext());
-                if (mediaBeans == null) {
-                    mediaBeans = new ArrayList<MediaBean>();
-                    allMediaList.mAllMediaHash.put(tableName, mediaBeans);
-                } else {
-                    mediaBeans.clear();
-                }
-                mediaBeans.addAll(mediaDBInterface.query(tableName, null, null));
+
+                mediaBeans.clear();
+                // TODO 切换查询的方式。
+//                mediaBeans.addAll(mediaDBInterface.query(tableName, null, null));
+                mediaBeans.addAll(MediaDbHelper.instance().query(tableName, null, null, false));
+                DebugLog.d("LoadThread", "run() mediaBeans size: " + mediaBeans.size());
                 allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName).sendToTarget();
             }
             isRunning = false;

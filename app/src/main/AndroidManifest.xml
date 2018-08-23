@@ -46,6 +46,10 @@
                 <data android:scheme="file" />
             </intent-filter>
         </receiver>
+
+        <provider android:name="com.amt.media.database.MediaContentProvider"
+            android:exported="true"
+            android:authorities="com.amt.media.contentprovider" />
     </application>
 
 </manifest>

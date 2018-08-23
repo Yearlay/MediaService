@@ -15,8 +15,10 @@ import com.amt.media.bean.StorageBean;
 import com.amt.media.bean.VideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
+import com.amt.media.datacache.AllMediaList;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
+import com.amt.media.util.MediaUtil;
 import com.amt.media.util.MediaUtil.FileType;
 import com.amt.media.util.UriConfig;
 import com.amt.mediaservice.MediaApplication;
@@ -38,6 +40,10 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         return mContext;
     }
 
+    public void setContext(Context mContext) {
+        this.mContext = mContext;
+    }
+
     private MediaDbHelper(Context context) {
         super(context, DBConfig.DATABASE_NAME, null, DBConfig.DATABASE_VERSION);
         mContext = context;
@@ -45,7 +51,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
 
     private static MediaDbHelper sMediaDbHelper = null;
     public static MediaDbHelper instance() {
-        if (sMediaDbHelper == null) {
+        if (sMediaDbHelper == null ) {
             sMediaDbHelper = new MediaDbHelper(MediaApplication.getInstance());
         }
         return sMediaDbHelper;
@@ -254,7 +260,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
                 notifyChange(tableName);
             }
         }  else {
-            DebugLog.e(TAG, "Error deleteEx tableName is null.");
+            DebugLog.e(TAG, "Error insertEx tableName is null.");
         }
     }
 
@@ -265,13 +271,9 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         contentValues = mediaBean.getContentValues(contentValues);
         String whereClause = MediaBean.FIELD_ID + "=?";
         String[] whereArgs = new String[] {mediaBean.getId() + ""};
-        if (tableName != null) {
-            long ret = sqLiteDatabase.update(tableName, contentValues, whereClause, whereArgs);
-            if (ret > 0) {
-                notifyChange(tableName);
-            }
-        } else {
-            DebugLog.e(TAG, "Error updateEx tableName is null.");
+        long ret = sqLiteDatabase.update(tableName, contentValues, whereClause, whereArgs);
+        if (ret > 0) {
+            notifyChange(tableName);
         }
     }
 
@@ -280,6 +282,7 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      * @param tableName
      */
     public void notifyChange(String tableName) {
+        AllMediaList.instance().notifyChange(tableName);
         mContext.getContentResolver().notifyChange(Uri.parse(UriConfig.getUriAddress(tableName)), null);
     }
 

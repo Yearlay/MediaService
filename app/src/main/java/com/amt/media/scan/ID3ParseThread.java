@@ -12,6 +12,7 @@ import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
+import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugClock;
 import com.amt.util.DebugLog;
 
@@ -46,18 +47,17 @@ public class ID3ParseThread extends Thread {
     }
 
     private void parseMedia(StorageBean storageBean, int fileType) {
-        MediaDbHelper mediaDbHelper = MediaDbHelper.instance();
         String tableName = DBConfig.getTableName(storageBean.getPortId(), fileType);
-        ArrayList<MediaBean> mediaBeans = mediaDbHelper.query(tableName,
+        ArrayList<MediaBean> mediaBeans = mMediaDbHelper.query(tableName,
                 null, null, false);
         for (MediaBean mediaBean : mediaBeans) {
             mediaBean.parseID3();
         }
 
-        mediaDbHelper.setStartFlag(true);
+        mMediaDbHelper.setStartFlag(true);
         for (MediaBean mediaBean : mediaBeans) {
-            mediaDbHelper.update(mediaBean);
+            mMediaDbHelper.update(mediaBean);
         }
-        mediaDbHelper.setStartFlag(false);
+        mMediaDbHelper.setStartFlag(false);
     }
 }

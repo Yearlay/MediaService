@@ -8,6 +8,7 @@ import com.amt.media.bean.StorageBean;
 import com.amt.media.database.MediaDbHelper;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.StorageConfig;
+import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 
 import java.util.ArrayList;

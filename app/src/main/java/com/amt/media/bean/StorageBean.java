@@ -65,6 +65,22 @@ public class StorageBean {
         this.imageCount = imageCount;
     }
 
+    @Override
+    public String toString() {
+        return "StorageBean{" +
+                "id=" + id +
+                ", portId=" + portId +
+                ", storagePath='" + storagePath + '\'' +
+                ", storageName='" + storageName + '\'' +
+                ", storageSize=" + storageSize +
+                ", onlyReadFlag=" + onlyReadFlag +
+                ", state=" + state +
+                ", audioCount=" + audioCount +
+                ", videoCount=" + videoCount +
+                ", imageCount=" + imageCount +
+                '}';
+    }
+
     public int getId() {
         return id;
     }

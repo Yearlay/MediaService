@@ -16,6 +16,7 @@ import com.amt.media.bean.VideoBean;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.UriConfig;
+import com.amt.util.DebugLog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class MediaDBInterface {
         Uri uriAddress = Uri.parse(UriConfig.getUriAddress(tableName));
         int fileType = DBConfig.getFileType(tableName);
         boolean collectFlag = DBConfig.isCollectTable(tableName);
-        Cursor cursor =null;
+        Cursor cursor = null;
         try {
             cursor = mContext.getContentResolver().query(uriAddress, null,
                     whereClause, whereArgs, null);
@@ -53,6 +54,8 @@ public class MediaDBInterface {
                         mediaBeans.add(mediaBean);
                     }
                 } while (cursor.moveToNext());
+            } else {
+                DebugLog.e("Yearlay", "cursor is null.");
             }
         } catch (Exception e) {
             e.printStackTrace();
