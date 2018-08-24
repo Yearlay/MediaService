@@ -7,6 +7,7 @@ import android.os.Message;
 import com.amt.media.bean.StorageBean;
 import com.amt.media.database.MediaDbHelper;
 import com.amt.media.datacache.StorageManager;
+import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
@@ -39,9 +40,18 @@ public class ScanManager {
     }
 
     public void scanAllStorage() {
-        beginScanStorage(StorageConfig.PortId.SDCARD_PORT);
-        beginScanStorage(StorageConfig.PortId.USB1_PORT);
-        beginScanStorage(StorageConfig.PortId.USB2_PORT);
+        if (StorageConfig.fileCheckMounted(StorageConfig.SDCARD_STORAGE_PATH)) {
+            DebugLog.e(TAG, "scanAllStorage mountStorage SDCARD_PORT");
+            mountStorage(StorageConfig.PortId.SDCARD_PORT);
+        }
+        if (StorageConfig.fileCheckMounted(StorageConfig.USB1_STORAGE_PATH)) {
+            DebugLog.e(TAG, "scanAllStorage mountStorage USB1_PORT");
+            mountStorage(StorageConfig.PortId.USB1_PORT);
+        }
+        if (StorageConfig.fileCheckMounted(StorageConfig.USB2_STORAGE_PATH)) {
+            DebugLog.e(TAG, "scanAllStorage mountStorage USB2_PORT");
+            mountStorage(StorageConfig.PortId.USB2_PORT);
+        }
     }
     private ScanThread getScanRootPathThread() {
         if (mScanThread == null) {

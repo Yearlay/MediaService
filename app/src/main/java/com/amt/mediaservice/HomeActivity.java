@@ -1,5 +1,6 @@
 package com.amt.mediaservice;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.amt.media.datacache.LoadListener;
 import com.amt.media.datacache.StorageManager;
 import com.amt.media.jni.ScanJni;
 import com.amt.media.util.DBConfig;
+import com.amt.service.MediaService;
 import com.amt.util.DebugLog;
 
 import java.util.ArrayList;
@@ -50,6 +52,8 @@ public class HomeActivity extends AppCompatActivity implements LoadListener {
         mCurrentTableName = mTables[0];
         mMediaListAdapter = new MediaListAdapter(mCurrentTableName);
         mMediaListView.setAdapter(mMediaListAdapter);
+
+        startService(new Intent(this, MediaService.class));
     }
 
     @Override

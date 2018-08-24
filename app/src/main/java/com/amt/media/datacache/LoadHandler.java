@@ -3,12 +3,14 @@ package com.amt.media.datacache;
 import android.os.Handler;
 import android.os.Message;
 
+import com.amt.util.DebugLog;
+
 public class LoadHandler extends Handler {
     protected static final int BEGIN_LOAD_ITEM = 1;
     protected static final int END_LOAD_ITEM = 2;
     protected static final int END_LOAD_THREAD = 3;
 
-    protected LoadThread mLoadThread;
+    static LoadThread mLoadThread;
 
     @Override
     public void handleMessage(Message msg) {
@@ -21,7 +23,7 @@ public class LoadHandler extends Handler {
                 endLoadItem((String) msg.obj);
                 break;
             case END_LOAD_THREAD: // 加载线程执行结束。
-                mLoadThread = null;
+                DebugLog.d("LoadHandler", "END_LOAD_THREAD");
                 break;
             default:
                 break;

@@ -56,6 +56,7 @@ public class LoadThread extends Thread {
                 allMediaList.mLoadHandler.obtainMessage(LoadHandler.END_LOAD_ITEM, tableName).sendToTarget();
             }
             isRunning = false;
+            LoadHandler.mLoadThread = null;
         }
         allMediaList.mLoadHandler.sendEmptyMessage(LoadHandler.END_LOAD_THREAD);
     }

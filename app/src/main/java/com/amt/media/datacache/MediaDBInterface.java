@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MediaDBInterface {
+    private static String TAG = "MediaDBInterface";
     private Context mContext = null;
 
     private MediaDBInterface(Context context) {
@@ -55,7 +56,8 @@ public class MediaDBInterface {
                     }
                 } while (cursor.moveToNext());
             } else {
-                DebugLog.e("Yearlay", "cursor is null.");
+                DebugLog.e(TAG, cursor == null ? "cursor is null." : "no datas!" +
+                        " && tableName: " + tableName);
             }
         } catch (Exception e) {
             e.printStackTrace();
