@@ -84,6 +84,7 @@ public class MediaDBInterface {
                 DebugLog.e(TAG, cursor == null ? "cursor is null." : "no datas!" +
                         " && tableName: " + tableName);
             }
+            DebugLog.e(TAG, "query tableName: + " + tableName + " && size: " + mediaBeans.size());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

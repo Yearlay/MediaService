@@ -52,10 +52,18 @@ public class HomeActivity extends AppCompatActivity implements LoadListener {
         mMediaListView.setAdapter(mMediaListAdapter);
 
         startService(new Intent(this, MediaService.class));
+        AllMediaList.instance().registerLoadListener(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AllMediaList.instance().unRegisterLoadListener(this);
     }
 
     @Override
     public void onLoadCompleted(String tableName) {
+        DebugLog.d("HomeActivity", "onLoadCompleted tableName: " + tableName);
         mSourceAdapter.notifyDataSetChanged();
         if (tableName != null && tableName.equals(mCurrentTableName)) {
             mMediaListAdapter = new MediaListAdapter(mCurrentTableName);
@@ -153,9 +161,11 @@ public class HomeActivity extends AppCompatActivity implements LoadListener {
             } else {
                 textView = (TextView) view;
             }
-            MediaBean mediaBean = mediaBeans.get(position);
-            textView.setText(mediaBean.getFilePath());
-            textView.setTextColor(Color.BLACK);
+            if (position < mediaBeans.size()) {
+                MediaBean mediaBean = mediaBeans.get(position);
+                textView.setText(mediaBean.getFilePath());
+                textView.setTextColor(Color.BLACK);
+            }
             return textView;
         }
     }

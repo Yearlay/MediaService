@@ -46,7 +46,7 @@ public class UriConfig {
                 tableName = DBConfig.DBTable.SDCARD_AUDIO;
                 break;
             case URI_SDCARD_VIDEO_TYPE:
-                tableName = DBConfig.DBTable.SDCARD_AUDIO;
+                tableName = DBConfig.DBTable.SDCARD_VIDEO;
                 break;
             case URI_SDCARD_IMAGE_TYPE:
                 tableName = DBConfig.DBTable.SDCARD_IMAGE;

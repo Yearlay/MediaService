@@ -153,10 +153,6 @@ public class AllMediaList {
             if (collectFlag ||
                     (storageBean != null && storageBean.getState() >= StorageBean.FILE_SCAN_OVER)) {
                 mediaBeans = MediaDatas.getMediaList(tableName);
-                if (mediaBeans.size() == 0) {
-                    DebugLog.e(TAG, "getMediaList mediaBeans.size() == 0  BEGIN_LOAD_ITEM tableName:" + tableName);
-                    mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
-                }
                 DebugLog.e(TAG, "getMediaList mediaBeans size: " + mediaBeans.size());
             }
             if (mediaBeans == null) {
@@ -284,8 +280,28 @@ public class AllMediaList {
             storageBeans.clear();
             storageBeans.addAll(newBeans);
             DebugLog.d(TAG, "StorageContentObserver onChange newBeans size: " + storageBeans.size());
+            int[] fileTypes = new int[] {
+                    MediaUtil.FileType.AUDIO,
+                    MediaUtil.FileType.VIDEO,
+                    MediaUtil.FileType.IMAGE
+            };
+            boolean loadCollectFlag = false;
             for (StorageBean storageBean : storageBeans) {
                 DebugLog.d(TAG, storageBean.toString());
+                if (storageBean.getState() >= StorageBean.FILE_SCAN_OVER) {
+                    loadCollectFlag = true;
+                    for (int fileType : fileTypes) {
+                        String tableName = DBConfig.getTableName(storageBean.getPortId(), fileType);
+                        mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, tableName).sendToTarget();
+                    }
+                }
+            }
+            // 收藏表数据检查。
+            if (loadCollectFlag) {
+                for (int fileType : fileTypes) {
+                    String collectTableName = DBConfig.getCollectTableName(fileType);
+                    mLoadHandler.obtainMessage(LoadHandler.BEGIN_LOAD_ITEM, collectTableName).sendToTarget();
+                }
             }
         }
     }
