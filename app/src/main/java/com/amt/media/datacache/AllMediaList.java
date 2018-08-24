@@ -1,6 +1,5 @@
 package com.amt.media.datacache;
 
-import android.app.Application;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.net.Uri;
@@ -9,10 +8,8 @@ import android.os.Message;
 
 import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.StorageBean;
-import com.amt.media.database.MediaDbHelper;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
-import com.amt.media.util.StorageConfig;
 import com.amt.media.util.UriConfig;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;

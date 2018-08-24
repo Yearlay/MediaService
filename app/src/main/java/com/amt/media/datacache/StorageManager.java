@@ -1,8 +1,5 @@
 package com.amt.media.datacache;
 
-import android.os.Handler;
-import android.os.Message;
-
 import com.amt.media.bean.StorageBean;
 import com.amt.media.util.StorageConfig;
 

@@ -3,7 +3,6 @@ package com.amt.media.datacache;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.amt.media.bean.AudioBean;
