@@ -6,8 +6,13 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.amt.bt.BtMusicManager;
+import com.amt.media.bean.StorageBean;
+import com.amt.media.database.MediaDbHelper;
 import com.amt.media.datacache.AllMediaList;
 import com.amt.media.scan.ScanManager;
+import com.amt.media.scan.StorageManager;
+import com.amt.media.util.DBConfig;
+import com.amt.util.DebugLog;
 
 /**
  * Created by archermind on 2018/8/13.
@@ -41,6 +46,15 @@ public class MediaService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
+            String action = intent.getAction();
+            DebugLog.d(TAG, "action: " + action);
+            if ("action.amt.MEDIASERVICE".equals(action)) {
+                for (StorageBean storageBean : StorageManager.instance().getStorageBeans()) {
+                    if (storageBean.isMounted()) {
+                        MediaDbHelper.instance().notifyChange(DBConfig.DBTable.STORAGR);
+                    }
+                }
+            }
             int fromValue = intent.getIntExtra(KEY_COMMAND_FROM, 0);
             switch (fromValue) {
                 case VALUE_FROM_SCAN:
