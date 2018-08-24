@@ -35,6 +35,8 @@ public class MediaContentProvider extends ContentProvider {
         mUriMatcher.addURI(UriConfig.MEDIA_DB_AUTOHORITY, DBConfig.DBTable.SDCARD_AUDIO, UriConfig.URI_SDCARD_AUDIO_TYPE);
         mUriMatcher.addURI(UriConfig.MEDIA_DB_AUTOHORITY, DBConfig.DBTable.SDCARD_VIDEO, UriConfig.URI_SDCARD_VIDEO_TYPE);
         mUriMatcher.addURI(UriConfig.MEDIA_DB_AUTOHORITY, DBConfig.DBTable.SDCARD_IMAGE, UriConfig.URI_SDCARD_IMAGE_TYPE);
+
+        mUriMatcher.addURI(UriConfig.MEDIA_DB_AUTOHORITY, DBConfig.DBTable.STORAGR, UriConfig.URI_STORAGR_TYPE);
     }
 
     @Override
@@ -91,7 +93,7 @@ public class MediaContentProvider extends ContentProvider {
         SQLiteDatabase db = MediaDbHelper.instance().getWritableDatabase();
         int ret = 0;
         if (tableName != null) {
-            db.update(tableName, contentValues, selection, selectionArgs);
+            ret = db.update(tableName, contentValues, selection, selectionArgs);
         }
         return ret;
     }

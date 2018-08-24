@@ -8,6 +8,7 @@ import android.os.Message;
 
 import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.StorageBean;
+import com.amt.media.scan.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
 import com.amt.media.util.UriConfig;
@@ -15,13 +16,12 @@ import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by archermind on 2018/8/9.
  */
 
-public class AllMediaList implements StorageListener {
+public class AllMediaList {
     private static final String TAG = "AllMediaList";
 
     protected static Object mLoadLock = new Object();
@@ -31,6 +31,7 @@ public class AllMediaList implements StorageListener {
     protected ArrayList<LoadListener> mLoadListeners = new ArrayList<LoadListener>();
     protected OperateHandler mOperateHandler;
     private ArrayList<MediaContentObserver> mObserverList = new ArrayList<MediaContentObserver>();
+    private StorageContentObserver mStorageContentObserver;
 
     private Context mContext;
     public Context getContext() {
@@ -57,7 +58,6 @@ public class AllMediaList implements StorageListener {
         mOperateHandler = new OperateHandler();
 
         registerObserverAll();
-        StorageManager.instance().registerStorageListener(this);
     }
 
     private void registerObserverAll() {
@@ -77,6 +77,10 @@ public class AllMediaList implements StorageListener {
         registerObserver(UriConfig.URI_COLLECT_AUDIO_ADDR);
         registerObserver(UriConfig.URI_COLLECT_VIDEO_ADDR);
         registerObserver(UriConfig.URI_COLLECT_IMAGE_ADDR);
+
+        mStorageContentObserver = new StorageContentObserver(new Handler());
+        mContext.getContentResolver().registerContentObserver(
+                Uri.parse(UriConfig.URI_STORAGE_ADDR), true, mStorageContentObserver);
     }
 
     private void registerObserver(String UriStr) {
@@ -90,6 +94,9 @@ public class AllMediaList implements StorageListener {
         while (mObserverList.size() > 0) {
             MediaContentObserver observer = mObserverList.remove(0);
             mContext.getContentResolver().unregisterContentObserver(observer);
+        }
+        if (mStorageContentObserver != null) {
+            mContext.getContentResolver().unregisterContentObserver(mStorageContentObserver);
         }
     }
 
@@ -120,7 +127,7 @@ public class AllMediaList implements StorageListener {
                 MediaUtil.FileType.VIDEO,
                 MediaUtil.FileType.IMAGE
         };
-        for (StorageBean storageBean : StorageManager.instance().getDefaultStorageBeans()) {
+        for (StorageBean storageBean : mStorageContentObserver.storageBeans) {
             if (storageBean.getState() >= StorageBean.FILE_SCAN_OVER) {
                 for (int fileType : fileTypes) {
                     String tableName = DBConfig.getTableName(storageBean.getPortId(), fileType);
@@ -139,7 +146,7 @@ public class AllMediaList implements StorageListener {
         synchronized (mLoadLock) {
             ArrayList<MediaBean> mediaBeans = null;
             int portId = DBConfig.getPortId(tableName);
-            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            StorageBean storageBean = getStorageBean(portId);
             // storageBean == null: 是收藏表 或者 是错误地址。
             boolean collectFlag = DBConfig.isCollectTable(tableName);
             DebugLog.e(TAG, "getMediaList tableName: " + tableName);
@@ -228,24 +235,6 @@ public class AllMediaList implements StorageListener {
         mOperateHandler.sendMessage(message);
     }
 
-    @Override
-    public void onScanStateChange(StorageBean storageBean) {
-        int portId = storageBean.getPortId();
-        DebugLog.d(TAG, "onScanStateChange storageBean portId:" + portId + " && state: " + storageBean.getState());
-        if (storageBean.getState() >= StorageBean.ID3_PARSE_OVER) {
-            ArrayList<MediaBean> audioBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.AUDIO));
-            ArrayList<MediaBean> videoBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.VIDEO));
-            ArrayList<MediaBean> imageBeans = getMediaList(DBConfig.getTableName(portId, MediaUtil.FileType.IMAGE));
-            StorageManager.instance().updateStorageMediaCount(portId,
-                    audioBeans.size(), videoBeans.size(), imageBeans.size());
-        }
-    }
-
-    @Override
-    public void onMediaCountChange(StorageBean storageBean) {
-        DebugLog.d(TAG, "onMediaCountChange .....");
-    }
-
     class MediaContentObserver extends ContentObserver {
         public MediaContentObserver(Handler handler) {
             super(handler);
@@ -255,13 +244,48 @@ public class AllMediaList implements StorageListener {
         public void onChange(boolean selfChange, Uri uri) {
             super.onChange(selfChange, uri);
             String uriAddr = uri.toString();
-            DebugLog.d(TAG, "onChange uri: " + uriAddr);
+            DebugLog.d(TAG, "MediaContentObserver onChange uri: " + uriAddr);
             String tableName = UriConfig.getTableName(uriAddr);
             int portId = DBConfig.getPortId(tableName);
-            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            StorageBean storageBean = getStorageBean(portId);
             if (storageBean.getState() >= StorageBean.ID3_PARSE_OVER) {
                 DebugLog.d(TAG, "ID3_PARSE_OVER onChange uri: " + uriAddr);
                 notifyChange(tableName);
+            }
+        }
+    }
+
+    public StorageBean getStorageBean(int portId) {
+        StorageBean storageBean = null;
+        if (mStorageContentObserver != null) {
+            for (StorageBean bean : mStorageContentObserver.storageBeans) {
+                if (bean.getPortId() == portId) {
+                    storageBean = bean;
+                    break;
+                }
+            }
+        }
+        return storageBean;
+    }
+
+    class StorageContentObserver extends ContentObserver {
+        private ArrayList<StorageBean> storageBeans = new ArrayList<StorageBean>();
+
+        public StorageContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            String uriAddr = uri.toString();
+            DebugLog.d(TAG, "StorageContentObserver onChange uri: " + uriAddr);
+            ArrayList<StorageBean> newBeans = MediaDBInterface.instance(mContext).queryStorageBeans();
+            storageBeans.clear();
+            storageBeans.addAll(newBeans);
+            DebugLog.d(TAG, "StorageContentObserver onChange newBeans size: " + storageBeans.size());
+            for (StorageBean storageBean : storageBeans) {
+                DebugLog.d(TAG, storageBean.toString());
             }
         }
     }

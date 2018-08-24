@@ -1,15 +1,11 @@
 package com.amt.media.bean;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 
-import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.PingYingTool;
 import com.amt.media.util.StorageConfig;
-import com.amt.mediaservice.MediaApplication;
-import com.amt.util.DebugLog;
 
 import java.io.File;
 import java.io.FileDescriptor;

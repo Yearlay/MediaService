@@ -20,11 +20,9 @@ public class DBConfig {
     /**
      * 数据库的版本号：当前是1。
      */
-    public final static int DATABASE_VERSION = 2;
+    public final static int DATABASE_VERSION = 3;
 
     public class DBTable {
-        public final static int TABLE_COUNT = 12;
-
         public final static String SDCARD_AUDIO = "sdcard_audio";
         public final static String SDCARD_VIDEO = "sdcard_video";
         public final static String SDCARD_IMAGE = "sdcard_image";
@@ -40,6 +38,8 @@ public class DBConfig {
         public final static String COLLECT_AUDIO = "collect_audio";
         public final static String COLLECT_VIDEO = "collect_video";
         public final static String COLLECT_IMAGE = "collect_image";
+
+        public final static String STORAGR = "storage";
     }
 
     public static String getTableName(int portId, int fileType) {

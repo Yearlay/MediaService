@@ -11,6 +11,7 @@ import com.amt.media.bean.CollectImageBean;
 import com.amt.media.bean.CollectVideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
+import com.amt.media.bean.StorageBean;
 import com.amt.media.bean.VideoBean;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
@@ -35,6 +36,31 @@ public class MediaDBInterface {
             mSelf = new MediaDBInterface(context);
         }
         return mSelf;
+    }
+
+    public ArrayList<StorageBean> queryStorageBeans() {
+        ArrayList<StorageBean> storageBeans = new ArrayList<StorageBean>();
+        Uri uriAddress = Uri.parse(UriConfig.URI_STORAGE_ADDR);
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(uriAddress, null,
+                    null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    storageBeans.add(new StorageBean(cursor));
+                } while (cursor.moveToNext());
+            } else {
+                DebugLog.e(TAG, cursor == null ? "cursor is null." : "no datas!" +
+                        " && uriAddress: " + uriAddress.toString());
+            }
+        } catch (Exception e) {
+           e.printStackTrace();
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return storageBeans;
     }
 
     public ArrayList<MediaBean> query(String tableName, String whereClause, String[] whereArgs) {
@@ -109,5 +135,15 @@ public class MediaDBInterface {
         String whereClause = MediaBean.FIELD_ID + "=?";
         String[] whereArgs = new String[] {mediaBean.getId() + ""};
         mContext.getContentResolver().update(uriAddress, contentValues, whereClause, whereArgs);
+    }
+
+    public void update(StorageBean storageBean) {
+        Uri uriAddress = Uri.parse(UriConfig.getUriAddress(DBConfig.DBTable.STORAGR));
+        ContentValues contentValues = new ContentValues();
+        contentValues = storageBean.getContentValues();
+        String whereClause = StorageBean.FIELD_PORT_ID + "=?";
+        String[] whereArgs = new String[] {storageBean.getPortId() + ""};
+        mContext.getContentResolver().update(uriAddress,
+                storageBean.getContentValues(), whereClause, whereArgs);
     }
 }

@@ -36,6 +36,9 @@ public class UriConfig {
     public static final int URI_COLLECT_VIDEO_TYPE = 11;
     public static final int URI_COLLECT_IMAGE_TYPE = 12;
 
+    public static final String URI_STORAGE_ADDR = URI_HEAD + MEDIA_DB_AUTOHORITY + "/" + DBConfig.DBTable.STORAGR;
+    public static final int URI_STORAGR_TYPE = 13;
+
     public static String getTableNameByUriType(int uriType) {
         String tableName = null;
         switch (uriType) {
@@ -75,6 +78,9 @@ public class UriConfig {
             case URI_COLLECT_IMAGE_TYPE:
                 tableName = DBConfig.DBTable.COLLECT_IMAGE;
                 break;
+            case URI_STORAGR_TYPE:
+                tableName = DBConfig.DBTable.STORAGR;
+                break;
             default:
                 break;
         }
@@ -107,6 +113,8 @@ public class UriConfig {
             address = URI_COLLECT_VIDEO_ADDR;
         } else if (DBConfig.DBTable.COLLECT_IMAGE.equals(tableName)) {
             address = URI_COLLECT_IMAGE_ADDR;
+        } else if (DBConfig.DBTable.STORAGR.equals(tableName)) {
+            address = URI_STORAGE_ADDR;
         }
         return address;
     }
@@ -137,6 +145,8 @@ public class UriConfig {
             tableName = DBConfig.DBTable.COLLECT_VIDEO;
         } else if (URI_COLLECT_IMAGE_ADDR.equals(uriAddress)) {
             tableName = DBConfig.DBTable.COLLECT_IMAGE;
+        } else if (URI_STORAGE_ADDR.equals(uriAddress)) {
+            tableName = DBConfig.DBTable.STORAGR;
         }
         return tableName;
     }

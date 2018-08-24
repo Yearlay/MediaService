@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import com.amt.media.bean.StorageBean;
 import com.amt.media.database.MediaDbHelper;
-import com.amt.media.datacache.AllMediaList;
-import com.amt.media.datacache.StorageManager;
 import com.amt.media.jni.ScanJni;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;

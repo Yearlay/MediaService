@@ -7,9 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.amt.bt.BtMusicManager;
 import com.amt.media.datacache.AllMediaList;
-import com.amt.media.datacache.StorageManager;
 import com.amt.media.scan.ScanManager;
-import com.amt.radio.RadioManager;
 
 /**
  * Created by archermind on 2018/8/13.

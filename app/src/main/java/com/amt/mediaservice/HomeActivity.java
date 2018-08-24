@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -16,8 +15,7 @@ import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.StorageBean;
 import com.amt.media.datacache.AllMediaList;
 import com.amt.media.datacache.LoadListener;
-import com.amt.media.datacache.StorageManager;
-import com.amt.media.jni.ScanJni;
+import com.amt.media.scan.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.service.MediaService;
 import com.amt.util.DebugLog;
@@ -93,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements LoadListener {
             }
             String tableName = mTables[position];
             int portId = DBConfig.getPortId(tableName);
-            StorageBean storageBean = StorageManager.instance().getStorageBean(portId);
+            StorageBean storageBean = AllMediaList.instance().getStorageBean(portId);
 
             button.setText(tableName);
             button.setTextSize(16);

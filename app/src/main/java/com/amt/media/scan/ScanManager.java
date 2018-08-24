@@ -6,13 +6,8 @@ import android.os.Message;
 
 import com.amt.media.bean.StorageBean;
 import com.amt.media.database.MediaDbHelper;
-import com.amt.media.datacache.StorageManager;
-import com.amt.media.util.MediaUtil;
 import com.amt.media.util.StorageConfig;
-import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
-
-import java.util.ArrayList;
 
 public class ScanManager {
     public static final String SCAN_TYPE_KEY = "scan_type";
@@ -151,7 +146,7 @@ public class ScanManager {
         mID3ParseThread.setPriority(Thread.MIN_PRIORITY);
         mID3ParseThread.start();
 
-        for (StorageBean storageBean : StorageManager.instance().getDefaultStorageBeans()) {
+        for (StorageBean storageBean : StorageManager.instance().getStorageBeans()) {
             if (storageBean.isMounted() && storageBean.getState() != StorageBean.SCAN_ERROR) {
                 StorageManager.instance().updateStorageState(storageBean.getPortId(), StorageBean.ID3_PARSING);
             }
@@ -166,7 +161,7 @@ public class ScanManager {
     }
 
     public void endID3ParseEx() {
-        for (StorageBean storageBean : StorageManager.instance().getDefaultStorageBeans()) {
+        for (StorageBean storageBean : StorageManager.instance().getStorageBeans()) {
             if (storageBean.isMounted() && storageBean.getState() != StorageBean.SCAN_ERROR) {
                 StorageManager.instance().updateStorageState(storageBean.getPortId(), StorageBean.ID3_PARSE_OVER);
             }

@@ -1,5 +1,8 @@
 package com.amt.media.bean;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import com.amt.media.util.StorageConfig;
 
 /**
@@ -7,7 +10,6 @@ import com.amt.media.util.StorageConfig;
  */
 
 public class StorageBean {
-    private int id;
     /**
      * 磁盘的挂载端口
      * 0：未知，其他。
@@ -15,14 +17,19 @@ public class StorageBean {
      * 2. usb1 port.
      * 3. usb2 port.
      */
+    public static final String FIELD_PORT_ID = "port_id";
     private int portId;
+    public static final String FIELD_STORAGE_PATH = "storage_path";
     private String storagePath;
+    public static final String FIELD_STORAGE_NAME = "storage_name";
     private String storageName;
+    public static final String FIELD_STORAGE_SIZE = "storage_size";
     private long storageSize;
 
     /**
      * 0: 可读可写。 1：只读。
      */
+    public static final String FIELD_READ_ONLY = "read_only";
     private int onlyReadFlag;
 
     public static final int EJECT = 0;
@@ -42,10 +49,14 @@ public class StorageBean {
      * 5：文件扫描完成。正在进行媒体ID3解析。
      * 6：文件扫描完成。ID3解析完成。
      */
+    public static final String FIELD_SCAN_STATE = "scan_state";
     private int state;
 
+    public static final String FIELD_AUDIO_COUNT = "audio_count";
     private int audioCount;
+    public static final String FIELD_VIDEO_COUNT = "video_count";
     private int videoCount;
+    public static final String FIELD_IMAGE_COUNT = "image_count";
     private int imageCount;
 
     public StorageBean(int portId) {
@@ -65,28 +76,41 @@ public class StorageBean {
         this.imageCount = imageCount;
     }
 
+    public StorageBean(Cursor cursor) {
+        portId = cursor.getInt(cursor.getColumnIndex(FIELD_PORT_ID));
+        storagePath = cursor.getString(cursor.getColumnIndex(FIELD_STORAGE_PATH));
+        storageName = cursor.getString(cursor.getColumnIndex(FIELD_STORAGE_NAME));
+        storageSize = cursor.getLong(cursor.getColumnIndex(FIELD_STORAGE_SIZE));
+        onlyReadFlag = cursor.getInt(cursor.getColumnIndex(FIELD_READ_ONLY));
+        state = cursor.getInt(cursor.getColumnIndex(FIELD_SCAN_STATE));
+        audioCount = cursor.getInt(cursor.getColumnIndex(FIELD_AUDIO_COUNT));
+        videoCount = cursor.getInt(cursor.getColumnIndex(FIELD_VIDEO_COUNT));
+        imageCount = cursor.getInt(cursor.getColumnIndex(FIELD_IMAGE_COUNT));
+    }
+
+    public ContentValues getContentValues() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FIELD_PORT_ID, portId);
+        contentValues.put(FIELD_STORAGE_PATH, storagePath);
+        contentValues.put(FIELD_STORAGE_NAME, storageName);
+        contentValues.put(FIELD_STORAGE_SIZE, storageSize);
+        contentValues.put(FIELD_READ_ONLY, onlyReadFlag);
+        contentValues.put(FIELD_SCAN_STATE, state);
+        contentValues.put(FIELD_AUDIO_COUNT, audioCount);
+        contentValues.put(FIELD_VIDEO_COUNT, videoCount);
+        contentValues.put(FIELD_IMAGE_COUNT, imageCount);
+        return contentValues;
+    }
+
     @Override
     public String toString() {
         return "StorageBean{" +
-                "id=" + id +
                 ", portId=" + portId +
-                ", storagePath='" + storagePath + '\'' +
-                ", storageName='" + storageName + '\'' +
-                ", storageSize=" + storageSize +
-                ", onlyReadFlag=" + onlyReadFlag +
                 ", state=" + state +
                 ", audioCount=" + audioCount +
                 ", videoCount=" + videoCount +
                 ", imageCount=" + imageCount +
                 '}';
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getPortId() {

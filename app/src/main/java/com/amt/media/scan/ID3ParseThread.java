@@ -3,18 +3,12 @@ package com.amt.media.scan;
 
 import java.util.ArrayList;
 
-import android.content.Intent;
-
 import com.amt.media.bean.MediaBean;
 import com.amt.media.bean.StorageBean;
 import com.amt.media.database.MediaDbHelper;
-import com.amt.media.datacache.StorageManager;
 import com.amt.media.util.DBConfig;
 import com.amt.media.util.MediaUtil;
-import com.amt.media.util.StorageConfig;
-import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugClock;
-import com.amt.util.DebugLog;
 
 // 设备拔出时，必须停止该线程
 public class ID3ParseThread extends Thread {
@@ -36,7 +30,7 @@ public class ID3ParseThread extends Thread {
 
     private void updateID3Info() {
         DebugClock debugClock = new DebugClock();
-        for (StorageBean storageBean : StorageManager.instance().getDefaultStorageBeans()) {
+        for (StorageBean storageBean : StorageManager.instance().getStorageBeans()) {
             if (storageBean.isMounted()) {
                 parseMedia(storageBean, MediaUtil.FileType.AUDIO);
                 parseMedia(storageBean, MediaUtil.FileType.VIDEO);

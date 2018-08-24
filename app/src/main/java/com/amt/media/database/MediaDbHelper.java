@@ -15,11 +15,10 @@ import com.amt.media.bean.StorageBean;
 import com.amt.media.bean.VideoBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
-import com.amt.media.datacache.AllMediaList;
-import com.amt.media.datacache.StorageManager;
+import com.amt.media.scan.StorageManager;
 import com.amt.media.util.DBConfig;
-import com.amt.media.util.MediaUtil;
 import com.amt.media.util.MediaUtil.FileType;
+import com.amt.media.util.StorageConfig;
 import com.amt.media.util.UriConfig;
 import com.amt.mediaservice.MediaApplication;
 import com.amt.util.DebugLog;
@@ -81,6 +80,30 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(getCreateTableString(DBConfig.DBTable.COLLECT_AUDIO, FileType.AUDIO, true));
         sqLiteDatabase.execSQL(getCreateTableString(DBConfig.DBTable.COLLECT_VIDEO, FileType.VIDEO, true));
         sqLiteDatabase.execSQL(getCreateTableString(DBConfig.DBTable.COLLECT_IMAGE, FileType.IMAGE, true));
+
+        initStorageTableAndDatas(sqLiteDatabase);
+    }
+
+    private void initStorageTableAndDatas(SQLiteDatabase sqLiteDatabase) {
+        String createStorageTableStr = "create table " + DBConfig.DBTable.STORAGR + "(";
+        createStorageTableStr += StorageBean.FIELD_PORT_ID + " integer,";
+        createStorageTableStr += StorageBean.FIELD_STORAGE_PATH + " text,";
+        createStorageTableStr += StorageBean.FIELD_STORAGE_NAME + " text,";
+        createStorageTableStr += StorageBean.FIELD_STORAGE_SIZE + " long DEFAULT 0,";
+        createStorageTableStr += StorageBean.FIELD_READ_ONLY + " integer,";
+        createStorageTableStr += StorageBean.FIELD_SCAN_STATE + " integer,";
+        createStorageTableStr += StorageBean.FIELD_AUDIO_COUNT + " integer,";
+        createStorageTableStr += StorageBean.FIELD_VIDEO_COUNT + " integer,";
+        createStorageTableStr += StorageBean.FIELD_IMAGE_COUNT + " integer";
+        createStorageTableStr += ")";
+        sqLiteDatabase.execSQL(createStorageTableStr);
+
+        sqLiteDatabase.insert(DBConfig.DBTable.STORAGR, null,
+                new StorageBean(StorageConfig.PortId.SDCARD_PORT).getContentValues());
+        sqLiteDatabase.insert(DBConfig.DBTable.STORAGR, null,
+                new StorageBean(StorageConfig.PortId.USB1_PORT).getContentValues());
+        sqLiteDatabase.insert(DBConfig.DBTable.STORAGR, null,
+                new StorageBean(StorageConfig.PortId.USB2_PORT).getContentValues());
     }
 
     public void clearDataBase(SQLiteDatabase sqLiteDatabase) {
@@ -96,6 +119,8 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBConfig.DBTable.COLLECT_AUDIO);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBConfig.DBTable.COLLECT_VIDEO);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBConfig.DBTable.COLLECT_IMAGE);
+
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DBConfig.DBTable.STORAGR);
     }
 
     private String getCreateTableString(String table, int fileType, boolean isCollect) {
@@ -163,6 +188,26 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      */
     public void update(MediaBean mediaBean) {
         addToNeedToInsertList(new TransactionTask(mediaBean, TransactionTask.UPDATE_TASK));
+    }
+
+    private void insert(StorageBean storageBean) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        long ret = sqLiteDatabase.insert(DBConfig.DBTable.STORAGR, null,
+                storageBean.getContentValues());
+        if (ret > 0) {
+            notifyChange(DBConfig.DBTable.STORAGR);
+        }
+    }
+
+    public void update(StorageBean storageBean) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        String whereClause = StorageBean.FIELD_PORT_ID + "=?";
+        String[] whereArgs = new String[] {storageBean.getPortId() + ""};
+        long ret = sqLiteDatabase.update(DBConfig.DBTable.STORAGR,
+                storageBean.getContentValues(), whereClause, whereArgs);
+        if (ret > 0) {
+            notifyChange(DBConfig.DBTable.STORAGR);
+        }
     }
 
     public static class TransactionTask {
@@ -282,7 +327,6 @@ public class MediaDbHelper extends SQLiteOpenHelper {
      * @param tableName
      */
     public void notifyChange(String tableName) {
-        AllMediaList.instance().notifyChange(tableName);
         mContext.getContentResolver().notifyChange(Uri.parse(UriConfig.getUriAddress(tableName)), null);
     }
 
@@ -486,5 +530,4 @@ public class MediaDbHelper extends SQLiteOpenHelper {
         }
         return collectImageBeans;
     }
-
 }
