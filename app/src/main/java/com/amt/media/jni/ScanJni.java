@@ -1,5 +1,7 @@
 package com.amt.media.jni;
 
+import android.text.TextUtils;
+
 import com.amt.media.bean.AudioBean;
 import com.amt.media.bean.ImageBean;
 import com.amt.media.bean.MediaBean;
@@ -40,5 +42,18 @@ public class ScanJni {
             }
             mMediaDbHelper.insert(newMediaBean);
         }
+    }
+
+    public static String getPYEX(String hz) {
+        if (TextUtils.isEmpty(hz)) {
+            return "";
+        }
+        String str = null;
+        if (hz.length() > 40) {
+            str = hz.substring(0, 40);
+        } else {
+            str = hz;
+        }
+        return getPY(str);
     }
 }
